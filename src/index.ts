@@ -40,67 +40,6 @@ export interface AskAPIResultType {
   answer?: LogicformAPIResultType;
 }
 
-// export class ZeroETPClient {
-//   token: string;
-//   url: string = "http://localhost:3052/api/v1";
-
-//   constructor(config: ZeroETPClientConfig) {
-//     if (config.url) this.url = config.url;
-//     if (!config.token) throw new Error("创建ZeroETPClient需要token参数");
-
-//     this.token = config.token;
-//   }
-
-//   async _post<T = any, R = AxiosResponse<T>>(url: string, data: any) {
-//     return axios.post<R>(`${this.url}${url}`, data, {
-//       headers: { Authorization: `Bearer ${this.token}` },
-//     });
-//   }
-
-//   async signin(username: string, password: string) {
-//     return axios.post<SigninAPIResultType>(`${this.url}/auth/signin`, {
-//       username,
-//       password,
-//     });
-//   }
-
-//   async ask(question: string, logicform_only: boolean = false) {
-//     return this._post<AskAPIResultType>("/ask", {
-//       ask: question,
-//       logicform_only,
-//     });
-//   }
-
-//   async logicform(logicform: any) {
-//     return this._post<LogicformAPIResultType>("/logicform", logicform);
-//   }
-
-//   async createData(schema: SchemaType, data: any[]) {
-//     return this._post<LogicformAPIResultType>(`/data/${schema._id}`, {
-//       data,
-//     });
-//   }
-
-//   async updateDataByID(schema: SchemaType, dataID: string, updateItem: any) {
-//     return axios.put(
-//       `${this.url}/data/${schema._id}/${encodeURIComponent(dataID)}`,
-//       updateItem,
-//       {
-//         headers: { Authorization: `Bearer ${this.token}` },
-//       }
-//     );
-//   }
-
-//   async removeDataByID(schema: SchemaType, dataID: string) {
-//     return axios.delete(
-//       `${this.url}/data/${schema._id}/${encodeURIComponent(dataID)}`,
-//       {
-//         headers: { Authorization: `Bearer ${this.token}` },
-//       }
-//     );
-//   }
-// }
-
 export function execLogicform(logicform: LogicformType) {
   return request<LogicformAPIResultType>("/logicform", {
     method: "post",
