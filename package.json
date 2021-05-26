@@ -1,0 +1,33 @@
+{
+  "name": "zeroetp-api-sdk",
+  "version": "1.1.0",
+  "description": "零熵的访问SDK",
+  "main": "lib/index.js",
+  "module": "lib/index.esm.js",
+  "repository": "https://github.com/enteve/zeroetp-api-sdk",
+  "scripts": {
+    "test": "npm run build;node test/*.js | tap-spec",
+    "prebuild": "rm -rf lib",
+    "build": "rollup -c"
+  },
+  "keywords": [],
+  "author": "XiChi Zhu",
+  "license": "ISC",
+  "files": [
+    "lib",
+    "package.json",
+    "README.md"
+  ],
+  "devDependencies": {
+    "jsdom": "^16.6.0",
+    "jsdom-global": "^3.0.2",
+    "rollup": "^2.48.0",
+    "rollup-plugin-typescript2": "^0.30.0",
+    "tap-spec": "^5.0.0",
+    "tape": "^5.2.2",
+    "typescript": "^4.2.4"
+  },
+  "dependencies": {
+    "umi-request": "^1.3.5"
+  }
+}
