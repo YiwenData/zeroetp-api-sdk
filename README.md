@@ -1,36 +1,26 @@
-# hupun-open-api-nodejs-sdk
+# zeroetp-api-sdk
 
-对接万里牛 ERP 开放接口的 NodeJS SDK。
+零熵的访问 SDK。只能用于前端。
 
 ## 安装
 
 ```
-npm i hupun-open-api-nodejs-sdk --save
+npm i zeroetp-api-sdk --save
 ```
 
 ## 使用
 
 ```javascript
-import { HupunClient } from "hupun-open-api-nodejs-sdk";
+import APIService from "zeroetp-api-sdk";
 
-const client = new HupunClient({
-  appkey: "xxxxx",
-  appsecret: "xxxxxx",
+const ret = await APIService.ask("SKU", true);
+
+const ret2 = await APIService.execLogicform({
+  schema: "product",
+  operator: "$count",
 });
 
-client
-  .request("erp/base/storage/query", {
-    page_no: 1,
-    page_size: 1,
-  })
-  .then((res) => {
-    console.log(res.data);
-  })
-  .catch((e) => {
-    if (e.response) {
-      console.error(e.response.data);
-    } else {
-      console.error(e.message);
-    }
-  });
+await APIService.createData({ _id: "product" }, [{ _id: "x", 名称: "x" }]);
+await APIService.updateDataByID({ _id: "product" }, "x", { 名称: "xx" });
+await APIService.removeDataByID({ _id: "product" }, "x");
 ```
