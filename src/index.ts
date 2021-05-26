@@ -6,12 +6,6 @@ import request from "./request";
 import { LogicformType } from "./logicform";
 import { SchemaType } from "./schema";
 import { PropertyType } from "./property";
-
-export interface ZeroETPClientConfig {
-  token: string;
-  url?: string;
-}
-
 export interface SigninAPIResultType {
   token: string;
   user: any;
@@ -40,14 +34,27 @@ export interface AskAPIResultType {
   answer?: LogicformAPIResultType;
 }
 
-export function execLogicform(logicform: LogicformType) {
+export async function signin(params: any) {
+  const response = await request<SigninAPIResultType>("/auth/signin", {
+    method: "post",
+    data: params,
+  });
+
+  if (response.token) {
+    window.localStorage.setItem("token", response.token);
+  }
+
+  return response;
+}
+
+export async function execLogicform(logicform: LogicformType) {
   return request<LogicformAPIResultType>("/logicform", {
     method: "post",
     data: logicform,
   });
 }
 
-export function ask(
+export async function ask(
   question: string,
   logicformOnly: boolean,
   preNode?: LogicformType
@@ -62,7 +69,7 @@ export function ask(
   });
 }
 
-export function createData(schema: SchemaType, data: any) {
+export async function createData(schema: SchemaType, data: any) {
   return request(`/data/${schema._id}`, {
     method: "post",
     data: {
@@ -71,7 +78,7 @@ export function createData(schema: SchemaType, data: any) {
   });
 }
 
-export function updateDataByID(
+export async function updateDataByID(
   schema: SchemaType,
   dataID: string,
   updateItem: any
@@ -82,11 +89,11 @@ export function updateDataByID(
   });
 }
 
-export function getDataByID(schema: SchemaType, dataID: string) {
+export async function getDataByID(schema: SchemaType, dataID: string) {
   return request(`/data/${schema._id}/${encodeURIComponent(dataID)}`);
 }
 
-export function removeDataByID(schema: SchemaType, dataID: string) {
+export async function removeDataByID(schema: SchemaType, dataID: string) {
   return request(`/data/${schema._id}/${encodeURIComponent(dataID)}`, {
     method: "delete",
   });

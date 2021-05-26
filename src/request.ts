@@ -10,7 +10,7 @@ const codeMessage: { [key: number]: string } = {
   202: "一个请求已经进入后台排队（异步任务）。",
   204: "删除数据成功。",
   400: "发出的请求有错误，服务器没有进行新建或修改数据的操作。",
-  401: "用户登录过期",
+  401: "用户令牌失效，请重新重新登录",
   403: "此账号无权访问此数据",
   404: "发出的请求针对的是不存在的记录，服务器没有进行操作。",
   406: "请求的格式不可得。",
@@ -23,34 +23,14 @@ const codeMessage: { [key: number]: string } = {
 };
 
 /**
- * 异常处理程序
- */
-const errorHandler = (error: { response: Response }): Response => {
-  const { response } = error;
-  if (response && response.status) {
-    response.json().then((jsonResponse) => {
-      const errorText =
-        (jsonResponse && jsonResponse.error) ||
-        codeMessage[response.status] ||
-        response.statusText;
-
-      throw new Error(errorText);
-    });
-  } else if (!response) {
-    throw new Error("您的网络发生异常，无法连接服务器");
-  }
-  return response;
-};
-
-/**
  * 配置request请求时的默认参数
  */
 const requestExtend = extend({
-  errorHandler, // 默认错误处理
-  credentials: "include", // 默认请求是否带上cookie
+  // errorHandler, // 默认错误处理
+  credentials: "include", // CORS
 });
 
-const request = <T = any>(url: string, options?: RequestOptionsInit) => {
+const request = async <T = any>(url: string, options?: RequestOptionsInit) => {
   const newOptions: RequestOptionsInit = { ...options };
 
   if (window.localStorage && window.localStorage.token) {
@@ -59,7 +39,23 @@ const request = <T = any>(url: string, options?: RequestOptionsInit) => {
     };
   }
 
-  return requestExtend<T>(`/api/v1${url}`, newOptions);
+  try {
+    const response = await requestExtend<T>(`/api/v1${url}`, newOptions);
+    return response;
+  } catch (error) {
+    const response: Response = error.response;
+    if (response && response.status) {
+      const jsonResponse = await response.json();
+      const errorText =
+        (jsonResponse && jsonResponse.error) ||
+        codeMessage[response.status] ||
+        response.statusText;
+
+      throw new Error(errorText);
+    } else {
+      throw new Error("您的网络发生异常，无法连接服务器");
+    }
+  }
 };
 
 export default request;
