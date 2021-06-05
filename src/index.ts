@@ -47,6 +47,10 @@ export async function signin(params: any) {
   return response;
 }
 
+export async function currentUser() {
+  return request("/auth/currentUser");
+}
+
 export async function execLogicform(logicform: LogicformType) {
   return request<LogicformAPIResultType>("/logicform", {
     method: "post",

@@ -14,4 +14,5 @@ export interface LogicformType {
   entity?: any; // 这个是custom function会出现的
   having?: object;
   populate?: string[];
+  close_default_query?: boolean; // 是否不用default_query
 }

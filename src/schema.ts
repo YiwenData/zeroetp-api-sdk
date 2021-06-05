@@ -10,4 +10,5 @@ export interface SchemaType {
   editable: boolean; // 前端是否能修改数据
   show_id: boolean; // 前端是否展示_id
   hierarchy?: any[];
+  refLF?: any[];
 }
