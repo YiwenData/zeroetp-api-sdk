@@ -18,7 +18,7 @@ export interface LogicformAPIResultType {
   error?: any;
   columnProperties: PropertyType[];
   functionInfo?: any;
-  returnType:
+  returnType?:
     | "value"
     | "table"
     | "entity"
