@@ -16,3 +16,19 @@ export interface LogicformType {
   populate?: string[];
   close_default_query?: boolean; // 是否不用default_query
 }
+
+export const isSimpleQuery = (logicform: LogicformType) => {
+  if ("groupby" in logicform || "operator" in logicform) {
+    return false;
+  }
+
+  if (logicform.preds) {
+    for (const predItem of logicform.preds) {
+      if (typeof predItem !== "string") {
+        return false;
+      }
+    }
+  }
+
+  return true;
+};
