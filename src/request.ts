@@ -40,7 +40,7 @@ const request = async <T = any>(url: string, options?: RequestOptionsInit) => {
   }
 
   try {
-    const response = await requestExtend<T>(`/api/v1${url}`, newOptions);
+    const response = await requestExtend<T>(url, newOptions);
     return response;
   } catch (error) {
     const response: Response = error.response;

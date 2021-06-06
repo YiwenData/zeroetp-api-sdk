@@ -4,9 +4,10 @@ const APIService = require("../lib/index");
 // Fake localstorage
 require("jsdom-global")("", { url: "http://localhost:3052" });
 
-// 1. 在request.ts里面要把URL变一下
 test("test request", async function (t) {
   try {
+    APIService.config.API_URL = "http://localhost:3052";
+
     await APIService.signin({
       username: "admin",
       password: "12345678",

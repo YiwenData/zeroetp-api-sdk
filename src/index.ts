@@ -11,6 +11,12 @@ export interface SigninAPIResultType {
   user: any;
 }
 
+export const config = {
+  API_URL: "",
+};
+
+const serverUrl = (url: string) => `${config.API_URL}/api/v1${url}`;
+
 export interface LogicformAPIResultType {
   schema: SchemaType;
   result: any;
@@ -35,10 +41,13 @@ export interface AskAPIResultType {
 }
 
 export async function signin(params: any) {
-  const response = await request<SigninAPIResultType>("/auth/signin", {
-    method: "post",
-    data: params,
-  });
+  const response = await request<SigninAPIResultType>(
+    serverUrl("/auth/signin"),
+    {
+      method: "post",
+      data: params,
+    }
+  );
 
   if (response.token) {
     window.localStorage.setItem("token", response.token);
@@ -48,11 +57,11 @@ export async function signin(params: any) {
 }
 
 export async function currentUser() {
-  return request("/auth/currentUser");
+  return request(serverUrl("/auth/currentUser"));
 }
 
 export async function execLogicform(logicform: LogicformType) {
-  return request<LogicformAPIResultType>("/logicform", {
+  return request<LogicformAPIResultType>(serverUrl("/logicform"), {
     method: "post",
     data: logicform,
   });
@@ -63,7 +72,7 @@ export async function ask(
   logicformOnly: boolean,
   preNode?: LogicformType
 ) {
-  return request<AskAPIResultType>("/ask", {
+  return request<AskAPIResultType>(serverUrl("/ask"), {
     method: "post",
     data: {
       ask: question,
@@ -74,7 +83,7 @@ export async function ask(
 }
 
 export async function createData(schema: SchemaType, data: any) {
-  return request(`/data/${schema._id}`, {
+  return request(serverUrl(`/data/${schema._id}`), {
     method: "post",
     data: {
       data,
@@ -87,18 +96,26 @@ export async function updateDataByID(
   dataID: string,
   updateItem: any
 ) {
-  return request(`/data/${schema._id}/${encodeURIComponent(dataID)}`, {
-    method: "put",
-    data: updateItem,
-  });
+  return request(
+    serverUrl(`/data/${schema._id}/${encodeURIComponent(dataID)}`),
+    {
+      method: "put",
+      data: updateItem,
+    }
+  );
 }
 
 export async function getDataByID(schema: SchemaType, dataID: string) {
-  return request(`/data/${schema._id}/${encodeURIComponent(dataID)}`);
+  return request(
+    serverUrl(`/data/${schema._id}/${encodeURIComponent(dataID)}`)
+  );
 }
 
 export async function removeDataByID(schema: SchemaType, dataID: string) {
-  return request(`/data/${schema._id}/${encodeURIComponent(dataID)}`, {
-    method: "delete",
-  });
+  return request(
+    serverUrl(`/data/${schema._id}/${encodeURIComponent(dataID)}`),
+    {
+      method: "delete",
+    }
+  );
 }
