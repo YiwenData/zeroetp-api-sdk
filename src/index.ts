@@ -121,5 +121,5 @@ export async function removeDataByID(schema: SchemaType, dataID: string) {
 }
 
 export async function getSchemaByID(schemaID: string) {
-  return request(serverUrl(`/schema/${schemaID}`));
+  return request(serverUrl(`/schemas/${schemaID}`));
 }
