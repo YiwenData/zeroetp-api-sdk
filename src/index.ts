@@ -40,6 +40,10 @@ export interface AskAPIResultType {
   answer?: LogicformAPIResultType;
 }
 
+export interface SchemaAPIResultType {
+  schema: SchemaType;
+}
+
 export async function signin(params: any) {
   const response = await request<SigninAPIResultType>(
     serverUrl("/auth/signin"),
@@ -121,5 +125,5 @@ export async function removeDataByID(schema: SchemaType, dataID: string) {
 }
 
 export async function getSchemaByID(schemaID: string) {
-  return request(serverUrl(`/schemas/${schemaID}`));
+  return request<SchemaAPIResultType>(serverUrl(`/schemas/${schemaID}`));
 }
