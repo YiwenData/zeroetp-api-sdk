@@ -28,6 +28,7 @@ export interface PropertyType {
   ref?: string;
   ref_prop?: string;
   unit?: string;
+  level?: string; // 只有在type为object的时候会存在，表达这个object的最细粒度为某一个level。 TODO：之后time的granularity和level合并
   schema?: any; // 就这样吧，不然会有循环导入
   stats?: {
     min?: number;
