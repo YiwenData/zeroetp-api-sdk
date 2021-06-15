@@ -77,3 +77,16 @@ export const findPropByName = (schema: SchemaType, propName: string) => {
 
   return prop;
 };
+
+export const getHierarchyCodeLength = (schema: SchemaType, level: string) => {
+  if (!schema.hierarchy) {
+    return -1;
+  }
+
+  let codeLength = 0;
+  for (const hierarchyItem of schema.hierarchy) {
+    codeLength += hierarchyItem.code_length;
+    if (hierarchyItem.name === level) break;
+  }
+  return codeLength;
+};
