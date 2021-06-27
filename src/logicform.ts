@@ -14,6 +14,7 @@ export interface LogicformType {
   entity?: any; // 这个是custom function会出现的
   having?: object;
   populate?: string[];
+  expands?: string[]; // 对若干个子字段进行entity的展开。
   close_default_query?: boolean; // 是否不用default_query
 }
 
