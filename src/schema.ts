@@ -61,9 +61,14 @@ export function getGroupbyProperty(schema: SchemaType, groupby: any) {
 export const findPropByName = (schema: SchemaType, propName: string) => {
   if (propName.startsWith("_")) return undefined;
 
+  let prop: PropertyType | undefined;
+
+  // 先直接找。因为可能schema是动态生成的
+  prop = schema.properties.find((p) => p.name === propName);
+  if (prop) return prop;
+
   const chain = propName.split("_");
   let currentSchema = schema;
-  let prop: PropertyType | undefined;
   chain.forEach((chainItem, index) => {
     prop = currentSchema.properties.find((p) => p.name === chainItem);
     if (!prop) throw new Error(`没有找到属性: ${propName}`);
