@@ -16,7 +16,8 @@ export const config = {
 };
 
 const serverUrl = (url: string) => `${config.API_URL}/api/v1${url}`;
-
+const schemaID = (schema: SchemaType | string) =>
+  typeof schema === "string" ? schema : schema._id;
 export interface LogicformAPIResultType {
   schema: SchemaType;
   result: any;
@@ -86,8 +87,8 @@ export async function ask(
   });
 }
 
-export async function createData(schema: SchemaType, data: any) {
-  return request(serverUrl(`/data/${schema._id}`), {
+export async function createData(schema: SchemaType | string, data: any) {
+  return request(serverUrl(`/data/${schemaID(schema)}`), {
     method: "post",
     data: {
       data,
@@ -109,15 +110,32 @@ export async function updateDataByID(
   );
 }
 
-export async function getDataByID(schema: SchemaType, dataID: string) {
+export async function updateData(
+  schema: SchemaType | string,
+  query: any,
+  update: any
+) {
+  return request(serverUrl(`/data/${schemaID(schema)}`), {
+    method: "put",
+    data: {
+      query,
+      update,
+    },
+  });
+}
+
+export async function getDataByID(schema: SchemaType | string, dataID: string) {
   return request(
-    serverUrl(`/data/${schema._id}/${encodeURIComponent(dataID)}`)
+    serverUrl(`/data/${schemaID(schema)}/${encodeURIComponent(dataID)}`)
   );
 }
 
-export async function removeDataByID(schema: SchemaType, dataID: string) {
+export async function removeDataByID(
+  schema: SchemaType | string,
+  dataID: string
+) {
   return request(
-    serverUrl(`/data/${schema._id}/${encodeURIComponent(dataID)}`),
+    serverUrl(`/data/${schemaID(schema)}/${encodeURIComponent(dataID)}`),
     {
       method: "delete",
     }
