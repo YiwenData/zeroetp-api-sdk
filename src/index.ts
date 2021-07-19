@@ -97,12 +97,12 @@ export async function createData(schema: SchemaType | string, data: any) {
 }
 
 export async function updateDataByID(
-  schema: SchemaType,
+  schema: SchemaType | string,
   dataID: string,
   updateItem: any
 ) {
   return request(
-    serverUrl(`/data/${schema._id}/${encodeURIComponent(dataID)}`),
+    serverUrl(`/data/${schemaID(schema)}/${encodeURIComponent(dataID)}`),
     {
       method: "put",
       data: updateItem,
@@ -140,6 +140,13 @@ export async function removeDataByID(
       method: "delete",
     }
   );
+}
+
+export async function removeData(schema: SchemaType | string, query: any) {
+  return request(serverUrl(`/data/${schemaID(schema)}`), {
+    method: "delete",
+    data: query,
+  });
 }
 
 export async function getSchemaByID(schemaID: string) {
