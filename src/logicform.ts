@@ -1,5 +1,5 @@
 export interface LogicformType {
-  schema: string;
+  schema?: string;
   schemaName?: string;
   query?: any;
   total?: number;
@@ -16,6 +16,7 @@ export interface LogicformType {
   populate?: string[];
   expands?: string[]; // 对若干个子字段进行entity的展开。
   close_default_query?: boolean; // 是否不用default_query
+  children?: LogicformType[];
 }
 
 export const isSimpleQuery = (logicform: LogicformType) => {
