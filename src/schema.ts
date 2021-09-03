@@ -18,11 +18,9 @@ export function getIDProperty(schema: SchemaType) {
 }
 
 export function getNameProperty(schema: SchemaType) {
-  let nameProp = schema.properties.find((p: PropertyType) => p.is_name);
-
-  if (!nameProp) {
-    nameProp = schema.properties.find((p: PropertyType) => p.ui?.name);
-  }
+  let nameProp = schema.properties.find(
+    (p: PropertyType) => p.is_name || p.ui?.name
+  );
 
   if (!nameProp) {
     nameProp = schema.properties.find((p: PropertyType) => p.type === "ID");
