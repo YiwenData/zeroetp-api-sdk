@@ -6,6 +6,7 @@ import request from "./request";
 import { LogicformType } from "./logicform";
 import { SchemaType } from "./schema";
 import { PropertyType } from "./property";
+import type { RequestOptionsInit } from "umi-request";
 export interface SigninAPIResultType {
   token: string;
   user: any;
@@ -39,8 +40,8 @@ export interface AskAPIResultType {
   logicform: LogicformType;
   schema: SchemaType;
   answer?: LogicformAPIResultType;
+  error?: string;
 }
-
 export interface SchemaAPIResultType {
   schema: SchemaType;
 }
@@ -84,6 +85,13 @@ export async function ask(
       logicform_only: logicformOnly,
       pre_node: preNode,
     },
+  });
+}
+
+export async function voice(data: any) {
+  return request<any>(serverUrl("/nlq/voice"), {
+    method: "post",
+    data,
   });
 }
 
@@ -151,4 +159,11 @@ export async function removeData(schema: SchemaType | string, query: any) {
 
 export async function getSchemaByID(schemaID: string) {
   return request<SchemaAPIResultType>(serverUrl(`/schemas/${schemaID}`));
+}
+
+export async function commonRequest(
+  url: string,
+  options?: RequestOptionsInit | undefined
+) {
+  return request(serverUrl(url), options);
 }

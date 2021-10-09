@@ -106,3 +106,27 @@ export const normaliseRelativeDateForm = (value: any) => {
     $lte: baseDate.endOf(granuality).toDate(),
   };
 };
+
+/**
+ * 会修改传入的logicform，把groupby给normalise一下。
+ * @param logicform
+ */
+export const normaliseGroupby = (logicform: LogicformType) => {
+  if (!logicform.groupby) return;
+
+  if (typeof logicform.groupby === "string") {
+    logicform.groupby = [{ _id: logicform.groupby }];
+  }
+
+  if (!Array.isArray(logicform.groupby)) {
+    logicform.groupby = [logicform.groupby];
+  }
+
+  for (let i = 0; i < logicform.groupby.length; i++) {
+    const element = logicform.groupby[i];
+
+    if (typeof element === "string") {
+      logicform.groupby[i] = [{ _id: element }];
+    }
+  }
+};

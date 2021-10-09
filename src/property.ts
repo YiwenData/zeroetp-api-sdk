@@ -52,4 +52,9 @@ export interface PropertyType {
     startLevel?: string; // 这个是给HierarchySchema用的。在前端用Cascader来选择Object的时候，起始的一个level。一定要配合property自身的level属性才可以生效。
   };
   properties?: PropertyType[]; // 子Property
+  // 一个帮助的字段，不太确定是不是放这里比较好。目前的用途是告诉前端怎么去做下钻。
+  hierarchy?: {
+    up?: string;
+    down?: string;
+  };
 }
