@@ -1,12 +1,12 @@
 {
   "name": "zeroetp-api-sdk",
-  "version": "1.1.26",
+  "version": "1.1.27",
   "description": "零熵的访问SDK",
   "main": "lib/index.js",
   "module": "lib/index.esm.js",
   "repository": "https://github.com/enteve/zeroetp-api-sdk",
   "scripts": {
-    "test": "npm run build;node test/*.js | tap-spec",
+    "test": "npm run build;node test/util.js | tap-spec",
     "prebuild": "rm -rf lib",
     "prepublishOnly": "npm run build",
     "build": "rollup -c"

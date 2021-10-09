@@ -1,4 +1,4 @@
-import moment from "moment";
+import moment from 'moment';
 export interface LogicformType {
   schema?: string;
   schemaName?: string;
@@ -22,13 +22,13 @@ export interface LogicformType {
 }
 
 export const isSimpleQuery = (logicform: LogicformType) => {
-  if ("groupby" in logicform || "operator" in logicform) {
+  if ('groupby' in logicform || 'operator' in logicform) {
     return false;
   }
 
   if (logicform.preds) {
     for (const predItem of logicform.preds) {
-      if (typeof predItem !== "string") {
+      if (typeof predItem !== 'string') {
         return false;
       }
     }
@@ -38,13 +38,13 @@ export const isSimpleQuery = (logicform: LogicformType) => {
 };
 
 export const getSupportedTimeWindows = () => {
-  return ["hour", "day", "week", "month", "quarter", "year"];
+  return ['hour', 'day', 'week', 'month', 'quarter', 'year'];
 };
 
 export const isRelativeDateForm = (dateValue: any) => {
-  if (typeof dateValue !== "object") return false;
+  if (typeof dateValue !== 'object') return false;
 
-  if ("$offset" in dateValue) {
+  if ('$offset' in dateValue) {
     return true;
   }
   const tws = getSupportedTimeWindows();
@@ -71,11 +71,11 @@ export const normaliseRelativeDateForm = (value: any) => {
 
       // sb moment，还要用个date，草泥马
       let twToSet: any = tw;
-      if (twToSet === "day") {
-        twToSet = "date";
+      if (twToSet === 'day') {
+        twToSet = 'date';
       }
 
-      if (twToSet === "month") {
+      if (twToSet === 'month') {
         // moment的month从0开始
         baseDate.set(twToSet, value[tw] - 1);
       } else {
@@ -84,7 +84,7 @@ export const normaliseRelativeDateForm = (value: any) => {
     }
   }
 
-  if ("$offset" in value) {
+  if ('$offset' in value) {
     // 相对时间的一种表达
     const v = value.$offset;
     // eslint-disable-next-line no-restricted-syntax
@@ -99,12 +99,62 @@ export const normaliseRelativeDateForm = (value: any) => {
     }
   }
 
-  if (granuality === "week") granuality = "isoWeek";
+  if (granuality === 'week') granuality = 'isoWeek';
 
   return {
     $gte: baseDate.startOf(granuality).toDate(),
     $lte: baseDate.endOf(granuality).toDate(),
   };
+};
+
+/**
+ *
+ * @param logicform
+ * @param timeOffsetQuery 带上日期字段的offset结构，只允许带一个key
+ */
+export const getLogicformByTimeOffset = (
+  logicform: LogicformType,
+  timeOffsetQuery: any
+) => {
+  const newLF = JSON.parse(JSON.stringify(logicform));
+  const [timeKey] = Object.keys(timeOffsetQuery);
+
+  if (!newLF.query) newLF.query = {};
+  if (!newLF.query[timeKey]) {
+    newLF.query = timeOffsetQuery;
+    return newLF;
+  }
+
+  if (isRelativeDateForm(newLF.query[timeKey])) {
+    if (!newLF.query[timeKey].$offset) {
+      newLF.query[timeKey].$offset = timeOffsetQuery[timeKey].$offset;
+      return newLF;
+    }
+
+    for (const offsetKey of Object.keys(timeOffsetQuery[timeKey].$offset)) {
+      if (offsetKey in newLF.query[timeKey].$offset) {
+        newLF.query[timeKey].$offset[offsetKey] +=
+          timeOffsetQuery[timeKey].$offset[offsetKey];
+      } else {
+        newLF.query[timeKey].$offset[offsetKey] =
+          timeOffsetQuery[timeKey].$offset[offsetKey];
+      }
+
+      return newLF;
+    }
+  }
+
+  // 不是RelativeDateForm，麻烦点
+  for (const offsetKey of Object.keys(timeOffsetQuery[timeKey].$offset)) {
+    const offsetValue = timeOffsetQuery[timeKey].$offset[offsetKey];
+    newLF.query[timeKey].$gte = moment(newLF.query[timeKey].$gte)
+      .add(offsetValue, offsetKey)
+      .toDate();
+    newLF.query[timeKey].$lte = moment(newLF.query[timeKey].$lte)
+      .add(offsetValue, offsetKey)
+      .toDate();
+  }
+  return newLF;
 };
 
 /**
@@ -114,7 +164,7 @@ export const normaliseRelativeDateForm = (value: any) => {
 export const normaliseGroupby = (logicform: LogicformType) => {
   if (!logicform.groupby) return;
 
-  if (typeof logicform.groupby === "string") {
+  if (typeof logicform.groupby === 'string') {
     logicform.groupby = [{ _id: logicform.groupby }];
   }
 
@@ -125,7 +175,7 @@ export const normaliseGroupby = (logicform: LogicformType) => {
   for (let i = 0; i < logicform.groupby.length; i++) {
     const element = logicform.groupby[i];
 
-    if (typeof element === "string") {
+    if (typeof element === 'string') {
       logicform.groupby[i] = [{ _id: element }];
     }
   }
