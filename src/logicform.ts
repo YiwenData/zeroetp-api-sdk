@@ -144,6 +144,17 @@ export const getLogicformByTimeOffset = (
     }
   }
 
+  if (isRelativeDateForm(newLF.query[timeKey].$gte)) {
+    newLF.query[timeKey].$gte = normaliseRelativeDateForm(
+      newLF.query[timeKey].$gte
+    ).$gte;
+  }
+  if (isRelativeDateForm(newLF.query[timeKey].$lte)) {
+    newLF.query[timeKey].$lte = normaliseRelativeDateForm(
+      newLF.query[timeKey].$lte
+    ).$lte;
+  }
+
   // 不是RelativeDateForm，麻烦点
   for (const offsetKey of Object.keys(timeOffsetQuery[timeKey].$offset)) {
     const offsetValue = timeOffsetQuery[timeKey].$offset[offsetKey];

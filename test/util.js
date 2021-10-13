@@ -55,4 +55,39 @@ test('getLogicformByTimeOffset', async function (t) {
     '20210128',
     '牵涉到MTD'
   );
+
+  // MTD
+  newLF = getLogicformByTimeOffset(
+    {
+      schema: 'a',
+      query: {
+        time: {
+          $gte: {
+            $offset: { month: 0 },
+          },
+          $lte: {
+            $offset: { day: 0 },
+          },
+        },
+      },
+    },
+    {
+      time: {
+        $offset: {
+          month: -1,
+        },
+      },
+    }
+  );
+
+  t.deepEqual(
+    moment(newLF.query.time.$gte).format('YYYYMMDD'),
+    moment().add(-1, 'month').startOf('month').format('YYYYMMDD'),
+    'MTD'
+  );
+  t.deepEqual(
+    moment(newLF.query.time.$lte).format('YYYYMMDD'),
+    moment().add(-1, 'month').endOf('day').format('YYYYMMDD'),
+    'MTD'
+  );
 });
