@@ -1,6 +1,6 @@
 {
   "name": "zeroetp-api-sdk",
-  "version": "1.1.28",
+  "version": "1.1.29",
   "description": "零熵的访问SDK",
   "main": "lib/index.js",
   "module": "lib/index.esm.js",

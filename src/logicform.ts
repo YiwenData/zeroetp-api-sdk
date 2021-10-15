@@ -187,7 +187,7 @@ export const normaliseGroupby = (logicform: LogicformType) => {
     const element = logicform.groupby[i];
 
     if (typeof element === 'string') {
-      logicform.groupby[i] = [{ _id: element }];
+      logicform.groupby[i] = { _id: element };
     }
   }
 };

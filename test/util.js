@@ -90,4 +90,30 @@ test('getLogicformByTimeOffset', async function (t) {
     moment().add(-1, 'month').endOf('day').format('YYYYMMDD'),
     'MTD'
   );
+
+  // do not forget other query
+  newLF = getLogicformByTimeOffset(
+    {
+      schema: 'a',
+      query: {
+        cate: 'a',
+        time: {
+          $gte: {
+            $offset: { month: 0 },
+          },
+          $lte: {
+            $offset: { day: 0 },
+          },
+        },
+      },
+    },
+    {
+      time: {
+        $offset: {
+          month: -1,
+        },
+      },
+    }
+  );
+  t.equal(newLF.query.cate, 'a', 'do not forget other query');
 });
