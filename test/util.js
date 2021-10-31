@@ -116,4 +116,48 @@ test('getLogicformByTimeOffset', async function (t) {
     }
   );
   t.equal(newLF.query.cate, 'a', 'do not forget other query');
+
+  // year do not have last month
+  newLF = getLogicformByTimeOffset(
+    {
+      schema: 'a',
+      query: {
+        time: {
+          $gte: {
+            $offset: { year: 0 },
+          },
+          $lte: {
+            $offset: { day: 0 },
+          },
+        },
+      },
+    },
+    {
+      time: {
+        $offset: {
+          month: -1,
+        },
+      },
+    }
+  );
+  t.equal(newLF, null, 'year do not have last month');
+
+  newLF = getLogicformByTimeOffset(
+    {
+      schema: 'a',
+      query: {
+        time: {
+          year: 2021,
+        },
+      },
+    },
+    {
+      time: {
+        $offset: {
+          month: -1,
+        },
+      },
+    }
+  );
+  t.equal(newLF, null, 'year do not have last month');
 });

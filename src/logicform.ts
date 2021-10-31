@@ -107,6 +107,28 @@ export const normaliseRelativeDateForm = (value: any) => {
   };
 };
 
+function formatStringForTimeWindow(tw: string) {
+  if (tw === 'year') {
+    return 'YYYY';
+  } else if (tw === 'quarter') {
+    return 'YYYY[Q]Q';
+  } else if (tw === 'month') {
+    return 'YYYY-MM';
+  } else if (tw === 'week') {
+    return 'GGGG[W]WW';
+  } else if (tw === 'day') {
+    return 'YYYY-MM-DD';
+  } else if (tw === 'hour') {
+    return 'YYYY-MM-DD HH点';
+  } else if (tw === 'toHour') {
+    return 'HH点';
+  } else if (tw === 'toDayOfWeek') {
+    return '周E';
+  }
+
+  throw new Error('[formatStringForTimeWindow]错误的tw参数');
+}
+
 /**
  *
  * @param logicform
@@ -118,6 +140,7 @@ export const getLogicformByTimeOffset = (
 ) => {
   const newLF = JSON.parse(JSON.stringify(logicform));
   const [timeKey] = Object.keys(timeOffsetQuery);
+  const [offsetLevel] = Object.keys(timeOffsetQuery[timeKey].$offset);
 
   if (!newLF.query) newLF.query = {};
   if (!newLF.query[timeKey]) {
@@ -127,21 +150,24 @@ export const getLogicformByTimeOffset = (
 
   if (isRelativeDateForm(newLF.query[timeKey])) {
     if (!newLF.query[timeKey].$offset) {
+      // 如果RelativeDateForm不包含offset本身的粒度，那么返回null；
+      // TODO：其实是应该是大于offset本身的粒度，那么返回null；
+      if (!(offsetLevel in newLF.query[timeKey])) {
+        return null;
+      }
+
       newLF.query[timeKey].$offset = timeOffsetQuery[timeKey].$offset;
       return newLF;
     }
 
-    for (const offsetKey of Object.keys(timeOffsetQuery[timeKey].$offset)) {
-      if (offsetKey in newLF.query[timeKey].$offset) {
-        newLF.query[timeKey].$offset[offsetKey] +=
-          timeOffsetQuery[timeKey].$offset[offsetKey];
-      } else {
-        newLF.query[timeKey].$offset[offsetKey] =
-          timeOffsetQuery[timeKey].$offset[offsetKey];
-      }
-
-      return newLF;
+    if (offsetLevel in newLF.query[timeKey].$offset) {
+      newLF.query[timeKey].$offset[offsetLevel] +=
+        timeOffsetQuery[timeKey].$offset[offsetLevel];
+    } else {
+      return null;
     }
+
+    return newLF;
   }
 
   if (isRelativeDateForm(newLF.query[timeKey].$gte)) {
@@ -153,6 +179,15 @@ export const getLogicformByTimeOffset = (
     newLF.query[timeKey].$lte = normaliseRelativeDateForm(
       newLF.query[timeKey].$lte
     ).$lte;
+  }
+
+  // 如果时间范围和offset的时间范围不一致，那么不能做时间偏移
+  const formatString = formatStringForTimeWindow(offsetLevel);
+  if (
+    moment(newLF.query[timeKey].$gte).format(formatString) !==
+    moment(newLF.query[timeKey].$lte).format(formatString)
+  ) {
+    return null;
   }
 
   // 不是RelativeDateForm，麻烦点

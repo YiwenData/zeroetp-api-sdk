@@ -1,10 +1,10 @@
-import { PropertyType } from "./property";
+import { PropertyType } from './property';
 
 export interface SchemaType {
   _id: string;
   name: string;
   syno?: string[];
-  type: "entity" | "event";
+  type: 'entity' | 'event';
   description?: string;
   properties: PropertyType[];
   editable?: boolean; // 前端是否能修改数据
@@ -14,7 +14,7 @@ export interface SchemaType {
 }
 
 export function getIDProperty(schema: SchemaType) {
-  return schema.properties.find((p: PropertyType) => p.type === "ID");
+  return schema.properties.find((p: PropertyType) => p.type === 'ID');
 }
 
 export function getNameProperty(schema: SchemaType) {
@@ -23,11 +23,11 @@ export function getNameProperty(schema: SchemaType) {
   );
 
   if (!nameProp) {
-    nameProp = schema.properties.find((p: PropertyType) => p.type === "ID");
+    nameProp = schema.properties.find((p: PropertyType) => p.type === 'ID');
   }
 
   if (!nameProp) {
-    nameProp = { name: "_id", constraints: { unique: true } } as PropertyType;
+    nameProp = { name: '_id', constraints: { unique: true } } as PropertyType;
   }
 
   return nameProp;
@@ -36,11 +36,11 @@ export function getNameProperty(schema: SchemaType) {
 export function getGroupbyProperty(schema: SchemaType, groupby: any) {
   if (!groupby) return null;
 
-  const groupbyID = typeof groupby === "string" ? groupby : groupby._id;
+  const groupbyID = typeof groupby === 'string' ? groupby : groupby._id;
 
   let prop;
-  if (groupbyID.indexOf("_") > 0) {
-    const parts = groupbyID.split("_");
+  if (groupbyID.indexOf('_') > 0) {
+    const parts = groupbyID.split('_');
     if (parts.length === 2) {
       const refProp = schema.properties.find((p) => p.name === parts[0]);
       if (refProp) {
@@ -57,7 +57,7 @@ export function getGroupbyProperty(schema: SchemaType, groupby: any) {
 }
 
 export const findPropByName = (schema: SchemaType, propName: string) => {
-  if (propName.startsWith("_")) return undefined;
+  if (propName.startsWith('_')) return undefined;
 
   let prop: PropertyType | undefined;
 
@@ -65,10 +65,15 @@ export const findPropByName = (schema: SchemaType, propName: string) => {
   prop = schema.properties.find((p) => p.name === propName);
   if (prop) return prop;
 
-  const chain = propName.split("_");
+  const chain = propName.split('_');
   let currentSchema = schema;
   chain.forEach((chainItem, index) => {
-    prop = currentSchema.properties.find((p) => p.name === chainItem);
+    // timewindow
+    if (chainItem.startsWith('$')) {
+      prop = currentSchema.properties.find((p) => p.type === 'timestamp');
+    } else {
+      prop = currentSchema.properties.find((p) => p.name === chainItem);
+    }
     if (!prop) throw new Error(`没有找到属性: ${propName}`);
 
     if (index < chain.length - 1) {

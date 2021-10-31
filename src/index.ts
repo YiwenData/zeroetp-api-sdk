@@ -1,38 +1,39 @@
-export * from "./logicform";
-export * from "./property";
-export * from "./schema";
+export * from './logicform';
+export * from './property';
+export * from './schema';
 
-import request from "./request";
-import { LogicformType } from "./logicform";
-import { SchemaType } from "./schema";
-import { PropertyType } from "./property";
-import type { RequestOptionsInit } from "umi-request";
+import request from './request';
+import { LogicformType } from './logicform';
+import { SchemaType } from './schema';
+import { PropertyType } from './property';
+import type { RequestOptionsInit } from 'umi-request';
 export interface SigninAPIResultType {
   token: string;
   user: any;
 }
 
 export const config = {
-  API_URL: "",
+  API_URL: '',
 };
 
 const serverUrl = (url: string) => `${config.API_URL}/api/v1${url}`;
 const schemaID = (schema: SchemaType | string) =>
-  typeof schema === "string" ? schema : schema._id;
+  typeof schema === 'string' ? schema : schema._id;
 export interface LogicformAPIResultType {
   schema: SchemaType;
   result: any;
   total?: number;
   error?: any;
+  logicform?: LogicformType; // normalized logicform
   columnProperties: PropertyType[];
   functionInfo?: any;
   returnType?:
-    | "value"
-    | "table"
-    | "entity"
-    | "entity-pred"
-    | "entity-list"
-    | "charts";
+    | 'value'
+    | 'table'
+    | 'entity'
+    | 'entity-pred'
+    | 'entity-list'
+    | 'charts';
   representationType?: string;
 }
 
@@ -48,27 +49,27 @@ export interface SchemaAPIResultType {
 
 export async function signin(params: any) {
   const response = await request<SigninAPIResultType>(
-    serverUrl("/auth/signin"),
+    serverUrl('/auth/signin'),
     {
-      method: "post",
+      method: 'post',
       data: params,
     }
   );
 
   if (response.token) {
-    window.localStorage.setItem("token", response.token);
+    window.localStorage.setItem('token', response.token);
   }
 
   return response;
 }
 
 export async function currentUser() {
-  return request(serverUrl("/auth/currentUser"));
+  return request(serverUrl('/auth/currentUser'));
 }
 
 export async function execLogicform(logicform: LogicformType) {
-  return request<LogicformAPIResultType>(serverUrl("/logicform"), {
-    method: "post",
+  return request<LogicformAPIResultType>(serverUrl('/logicform'), {
+    method: 'post',
     data: logicform,
   });
 }
@@ -78,8 +79,8 @@ export async function ask(
   logicformOnly: boolean,
   preNode?: LogicformType
 ) {
-  return request<AskAPIResultType>(serverUrl("/ask"), {
-    method: "post",
+  return request<AskAPIResultType>(serverUrl('/ask'), {
+    method: 'post',
     data: {
       ask: question,
       logicform_only: logicformOnly,
@@ -89,15 +90,15 @@ export async function ask(
 }
 
 export async function voice(data: any) {
-  return request<any>(serverUrl("/nlq/voice"), {
-    method: "post",
+  return request<any>(serverUrl('/nlq/voice'), {
+    method: 'post',
     data,
   });
 }
 
 export async function createData(schema: SchemaType | string, data: any) {
   return request(serverUrl(`/data/${schemaID(schema)}`), {
-    method: "post",
+    method: 'post',
     data: {
       data,
     },
@@ -112,7 +113,7 @@ export async function updateDataByID(
   return request(
     serverUrl(`/data/${schemaID(schema)}/${encodeURIComponent(dataID)}`),
     {
-      method: "put",
+      method: 'put',
       data: updateItem,
     }
   );
@@ -124,7 +125,7 @@ export async function updateData(
   update: any
 ) {
   return request(serverUrl(`/data/${schemaID(schema)}`), {
-    method: "put",
+    method: 'put',
     data: {
       query,
       update,
@@ -145,14 +146,14 @@ export async function removeDataByID(
   return request(
     serverUrl(`/data/${schemaID(schema)}/${encodeURIComponent(dataID)}`),
     {
-      method: "delete",
+      method: 'delete',
     }
   );
 }
 
 export async function removeData(schema: SchemaType | string, query: any) {
   return request(serverUrl(`/data/${schemaID(schema)}`), {
-    method: "delete",
+    method: 'delete',
     data: query,
   });
 }

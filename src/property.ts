@@ -5,24 +5,24 @@ export interface PropertyType {
   description?: string;
   type: string;
   primal_type:
-    | "string"
-    | "number"
-    | "boolean"
-    | "date"
-    | "image"
-    | "object"
-    | "geo"
-    | "nested"
-    | "mixed";
+    | 'string'
+    | 'number'
+    | 'boolean'
+    | 'date'
+    | 'image'
+    | 'object'
+    | 'geo'
+    | 'nested'
+    | 'mixed';
   granularity?:
-    | "second"
-    | "minute"
-    | "hour"
-    | "day"
-    | "week"
-    | "month"
-    | "week"
-    | "year";
+    | 'second'
+    | 'minute'
+    | 'hour'
+    | 'day'
+    | 'week'
+    | 'month'
+    | 'week'
+    | 'year';
   is_name?: boolean;
   is_categorical?: boolean;
   is_speedish?: boolean;
@@ -48,8 +48,9 @@ export interface PropertyType {
     ellipsis?: boolean;
     editable?: boolean;
     name?: boolean; // 是不是可以在UI上认为是name属性
-    type?: "file"; // 虽然是primal_type是string，但是在表现上，是一个文件。要通过extractContentFromFile进行转化
+    type?: 'file'; // 虽然是primal_type是string，但是在表现上，是一个文件。要通过extractContentFromFile进行转化
     startLevel?: string; // 这个是给HierarchySchema用的。在前端用Cascader来选择Object的时候，起始的一个level。一定要配合property自身的level属性才可以生效。
+    presentation?: 'table' | 'map' | 'pie' | 'bar' | 'entity' | 'value';
   };
   properties?: PropertyType[]; // 子Property
   // 一个帮助的字段，不太确定是不是放这里比较好。目前的用途是告诉前端怎么去做下钻。
