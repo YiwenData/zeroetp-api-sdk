@@ -2,7 +2,7 @@ const test = require('tape');
 const moment = require('moment');
 const APIService = require('../lib/index');
 
-const { getLogicformByTimeOffset } = APIService;
+const { getLogicformByTimeOffset, getMinTimeGranularity } = APIService;
 
 test('getLogicformByTimeOffset', async function (t) {
   let newLF = getLogicformByTimeOffset(
@@ -160,4 +160,21 @@ test('getLogicformByTimeOffset', async function (t) {
     }
   );
   t.equal(newLF, null, 'year do not have last month');
+
+  t.equal(
+    getMinTimeGranularity({
+      day: 1,
+    }),
+    'day',
+    'getMinTimeGranularity - relative form'
+  );
+
+  t.equal(
+    getMinTimeGranularity({
+      $gte: '2021-02-01 00:00:00',
+      $lte: '2021-02-28 23:59:59',
+    }),
+    'month',
+    'getMinTimeGranularity - normal form'
+  );
 });

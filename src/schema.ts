@@ -11,6 +11,7 @@ export interface SchemaType {
   show_id?: boolean; // 前端是否展示_id
   hierarchy?: any[];
   refLF?: any[];
+  use_db_date_as_mtd?: boolean; // 是不是要用数据库里面存在的数据的最后一天作为mtd，qtd，ytd的today的时间
 }
 
 export function getIDProperty(schema: SchemaType) {

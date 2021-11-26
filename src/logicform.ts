@@ -37,6 +37,7 @@ export const isSimpleQuery = (logicform: LogicformType) => {
   return true;
 };
 
+// getMinTimeGranularity用到了从小到大的逻辑，这个顺序不能改
 export const getSupportedTimeWindows = () => {
   return ['hour', 'day', 'week', 'month', 'quarter', 'year'];
 };
@@ -55,6 +56,37 @@ export const isRelativeDateForm = (dateValue: any) => {
   }
 
   return false;
+};
+
+export const getMinTimeGranularity = (dateValue: any) => {
+  // 这里假设了tws从小到大排序
+  const tws = getSupportedTimeWindows();
+
+  if (isRelativeDateForm(dateValue)) {
+    for (const tw of tws) {
+      if (tw in dateValue) return tw;
+    }
+  } else {
+    for (const tw of tws.reverse()) {
+      const twFormatString = formatStringForTimeWindow(tw);
+      const start = moment(dateValue.$gte);
+      const end = moment(dateValue.$lte);
+
+      let twNormed: any = tw === 'week' ? 'isoWeek' : tw;
+
+      if (
+        start.format(twFormatString) === end.format(twFormatString) &&
+        start.format('YYYYMMDDHHmmss') ===
+          moment(start).startOf(twNormed).format('YYYYMMDDHHmmss') &&
+        end.format('YYYYMMDDHHmmss') ===
+          moment(end).endOf(twNormed).format('YYYYMMDDHHmmss')
+      ) {
+        return tw;
+      }
+    }
+  }
+
+  return null;
 };
 
 export const normaliseRelativeDateForm = (value: any) => {
