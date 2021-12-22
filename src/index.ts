@@ -158,8 +158,64 @@ export async function removeData(schema: SchemaType | string, query: any) {
   });
 }
 
+// Schema CRUD
+export async function getSchemas() {
+  return request<SchemaAPIResultType>(serverUrl(`/schemas`));
+}
+
+export async function createSchema(schema: SchemaType) {
+  return request<SchemaAPIResultType>(serverUrl(`/schemas`), {
+    method: 'POST',
+    data: schema,
+  });
+}
+
 export async function getSchemaByID(schemaID: string) {
   return request<SchemaAPIResultType>(serverUrl(`/schemas/${schemaID}`));
+}
+
+// 除了property，_id，都能更新
+export async function updateSchema(schemaID: string, update: any) {
+  return request<SchemaAPIResultType>(serverUrl(`/schemas/${schemaID}`), {
+    method: 'PUT',
+    data: update,
+  });
+}
+
+export async function deleteSchema(schemaID: string) {
+  return request<SchemaAPIResultType>(serverUrl(`/schemas/${schemaID}`), {
+    method: 'DELETE',
+  });
+}
+
+// Property CRUD
+export async function addProperty(schemaID: string, property: PropertyType) {
+  return request<SchemaAPIResultType>(
+    serverUrl(`/schemas/${schemaID}/properties`),
+    {
+      method: 'POST',
+      data: property,
+    }
+  );
+}
+
+export async function removeProperty(schemaID: string, propertyName: string) {
+  return request<SchemaAPIResultType>(
+    serverUrl(`/schemas/${schemaID}/properties/${propertyName}`),
+    {
+      method: 'DELETE',
+    }
+  );
+}
+
+export async function updateProperty(schemaID: string, property: PropertyType) {
+  return request<SchemaAPIResultType>(
+    serverUrl(`/schemas/${schemaID}/properties/${property.name}`),
+    {
+      method: 'PUT',
+      data: property,
+    }
+  );
 }
 
 export async function commonRequest(

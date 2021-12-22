@@ -44,6 +44,12 @@ export interface PropertyType {
   isArray?: boolean;
   ui?: {
     formatter?: string;
+    formatters?: {
+      min?: number; // 大于等于这个数字，会使用这个formatter
+      max?: number; // 小于这个数字，会使用这个formatter
+      formatter: string;
+      prefix?: string; // unit的前缀
+    }[];
     show_in_detail_only?: boolean;
     ellipsis?: boolean;
     editable?: boolean;
