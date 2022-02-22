@@ -1,10 +1,10 @@
 {
   "name": "zeroetp-api-sdk",
-  "version": "1.1.36",
+  "version": "1.1.37",
   "description": "亿问API SDK",
   "main": "lib/index.js",
   "module": "lib/index.esm.js",
-  "repository": "https://github.com/enteve/zeroetp-api-sdk",
+  "repository": "https://github.com/YiwenData/zeroetp-api-sdk",
   "scripts": {
     "test": "npm run build;node test/util.js | tap-spec",
     "prebuild": "rm -rf lib",

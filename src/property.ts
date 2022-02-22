@@ -49,6 +49,7 @@ export interface PropertyType {
       max?: number; // 小于这个数字，会使用这个formatter
       formatter: string;
       prefix?: string; // unit的前缀
+      role?: string; // 针对某一个角色做的展示
     }[];
     show_in_detail_only?: boolean;
     ellipsis?: boolean;

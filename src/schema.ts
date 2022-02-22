@@ -1,18 +1,27 @@
 import { PropertyType } from './property';
 
-export interface SchemaType {
-  _id: string;
+interface HierarchyItemType {
   name: string;
   syno?: string[];
-  type: 'entity' | 'event';
+  code_length: number;
+}
+export interface SchemaType {
+  _id: string; // 只有在新建是才能选择，无法修改
+  name: string;
+  syno?: string[];
+  type: 'entity' | 'event'; // 只有在新建是才能选择，无法修改
   description?: string;
-  properties: PropertyType[];
+  properties: PropertyType[]; // 不能在修改schema的时候修改。用另外的接口。
   editable?: boolean; // 前端是否能修改数据
-  show_id?: boolean; // 前端是否展示_id
-  hierarchy?: any[];
-  refLF?: any[];
+  show_id?: boolean; // 前端是否展示_id列
+  hierarchy?: HierarchyItemType[];
   use_db_date_as_mtd?: boolean; // 是不是要用数据库里面存在的数据的最后一天作为mtd，qtd，ytd的today的时间
-  use_view?: boolean;
+  use_view?: boolean; // 一个优化选项，要不要用live view来替代view function
+  main_pred?: {
+    operator: string;
+    name: string;
+    pred?: any;
+  }; // 用于Alisa，默认的问答pred。有两个作用，一个是sort有_slot的时候，作为默认的pred。第二个是一旦设置了这个，那么在node为非is_schema的时候，把simpleQuery转化成pred计算;
 }
 
 export function getIDProperty(schema: SchemaType) {
