@@ -109,3 +109,37 @@ export const getHierarchyCodeLength = (schema: SchemaType, level: string) => {
   }
   return codeLength;
 };
+
+/**
+ * 获取该Schema可以下钻的属性列，包含chain和hierarchy schema的
+ * @param schema
+ * @returns
+ */
+export function getDrillDownProp(schema: SchemaType) {
+  if (!schema) return []; // 如果没有schema，代表logicform result报错了
+  const propNames: string[] = [];
+  schema.properties.forEach((property) => {
+    if (property.is_categorical) {
+      propNames.push(property.name);
+    } else if (property.type === 'object' && property.schema) {
+      propNames.push(property.name);
+
+      // 这里要获取其他schema的属性！
+      property.schema.properties.forEach((refProperty: PropertyType) => {
+        if (refProperty.is_categorical) {
+          propNames.push(`${property.name}_${refProperty.name}`);
+        }
+        if (refProperty.type === 'object') {
+          if (refProperty.schema && refProperty.schema.hierarchy) {
+            refProperty.schema.hierarchy.forEach((h: any) => {
+              propNames.push(`${property.name}_${refProperty.name}(${h.name})`);
+            });
+          } else {
+            propNames.push(`${property.name}_${refProperty.name}`);
+          }
+        }
+      });
+    }
+  });
+  return propNames;
+}

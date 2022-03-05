@@ -1,4 +1,16 @@
 import moment from 'moment';
+import { SchemaType, findPropByName, getNameProperty } from './schema';
+
+export interface PredItemObjectType {
+  pred?: string | PredItemObjectType;
+  operator: string;
+  name?: string;
+}
+
+export declare type PredItemType =
+  | string
+  | PredItemObjectType
+  | PredItemObjectType[];
 export interface LogicformType {
   schema?: string;
   schemaName?: string;
@@ -7,11 +19,11 @@ export interface LogicformType {
   sort?: object;
   limit?: number;
   skip?: number;
-  preds?: any[];
+  preds?: PredItemType[];
   field?: string;
   name?: string;
   operator?: string;
-  pred?: string;
+  pred?: PredItemType;
   groupby?: string | any;
   entity?: any; // 这个是custom function会出现的
   having?: object;
@@ -19,6 +31,7 @@ export interface LogicformType {
   expands?: string[]; // 对若干个子字段进行entity的展开。
   close_default_query?: boolean; // 是否不用default_query
   children?: LogicformType[];
+  _role?: string;
 }
 
 export const isSimpleQuery = (logicform: LogicformType) => {
@@ -257,4 +270,120 @@ export const normaliseGroupby = (logicform: LogicformType) => {
       logicform.groupby[i] = { _id: element };
     }
   }
+};
+
+/**
+ * 逻辑是这样的。
+ * TODO：写testcase
+ * groupby: "商品_分类"，从’单品‘开始下钻   ->  query:{商品_分类:'单品'}, groupby: "商品",
+ * 如果是多维groupby，按照第一个groupby去下钻
+ * @param logicform
+ * @param schema
+ * @param groupbyItem
+ * @returns new logicform
+ */
+export const drilldownLogicform = (
+  logicform: LogicformType,
+  schema: SchemaType,
+  groupbyItem: any,
+  downHierarchy?: string
+) => {
+  if (!logicform.groupby) return null; //必须有groupby才能下钻
+  const newLF: LogicformType = JSON.parse(JSON.stringify(logicform));
+  normaliseGroupby(newLF);
+  if (!newLF.query) newLF.query = {};
+
+  // 一般来说，__开头的，是前端自己添加的一些辅助行。例如汇总行之类的。
+  if (
+    (typeof groupbyItem === 'string' && groupbyItem.startsWith('__')) ||
+    (typeof groupbyItem === 'object' && groupbyItem._id.startsWith('__'))
+  ) {
+    return null;
+  }
+
+  // 获取下一层
+  const groupbyProp = findPropByName(schema, newLF.groupby[0]._id);
+  if (!groupbyProp) {
+    console.error(
+      `schema: ${schema._id} 中未找到groupbyProp：${newLF.groupby[0]._id}`
+    );
+    return null;
+  }
+
+  if (newLF.groupby[0].level) {
+    const hierarchy: any[] = groupbyProp.schema.hierarchy;
+
+    const thisLevelIndex = hierarchy.findIndex(
+      (h) => h.name === newLF.groupby[0].level
+    );
+    if (thisLevelIndex < hierarchy.length - 1) {
+      let drilldownLevel = 1;
+      let groupbyItemID = groupbyItem._id;
+
+      // 特殊逻辑，对于geo来说，直辖市直接下钻2级(重庆市除外，重庆市就算是直辖市，也有两个子分区)
+      if (groupbyProp.schema._id === 'geo') {
+        if (newLF.groupby[0].level === '省市') {
+          if (
+            groupbyItemID.endsWith('31') ||
+            groupbyItemID.endsWith('11') ||
+            groupbyItemID.endsWith('12')
+          ) {
+            // 4个直辖市判断
+            drilldownLevel = 2;
+            groupbyItemID += '01';
+          }
+        }
+      }
+
+      const nameProp = getNameProperty(groupbyProp.schema);
+      newLF.query[newLF.groupby[0]._id] = {
+        schema: groupbyProp.schema._id,
+        operator: '$ent',
+        field: nameProp.name,
+        name: groupbyItem[`${newLF.groupby[0]._id}(${newLF.groupby[0].level})`][
+          nameProp.name
+        ],
+      };
+      newLF.groupby[0].level = hierarchy[thisLevelIndex + drilldownLevel].name;
+      return newLF;
+    }
+  } else {
+    if (downHierarchy || groupbyProp.hierarchy?.down) {
+      const nextLevel = downHierarchy || groupbyProp.hierarchy?.down;
+      newLF.query = {
+        ...newLF.query,
+      };
+      newLF.query[newLF.groupby[0]._id] = groupbyItem._id;
+      const groupbyChain = newLF.groupby[0]._id.split('_');
+      groupbyChain.pop();
+      if (nextLevel === '_id') {
+        newLF.groupby[0] = groupbyChain[0];
+      } else {
+        newLF.groupby[0] = [...groupbyChain, nextLevel].join('_');
+      }
+
+      // 在这里change一下sort
+      if (newLF.sort) {
+        const newSort: any = {};
+
+        for (const [k, v] of Object.entries(newLF.sort)) {
+          if (k === groupbyProp.name) {
+            newSort[
+              typeof newLF.groupby[0] === 'string'
+                ? newLF.groupby[0]
+                : newLF.groupby[0]._id
+            ] = v;
+          } else {
+            newSort[k] = v;
+          }
+        }
+
+        newLF.sort = newSort;
+      }
+
+      return newLF;
+    }
+  }
+
+  return null;
 };
