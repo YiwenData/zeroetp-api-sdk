@@ -5,6 +5,10 @@ export interface PredItemObjectType {
   pred?: string | PredItemObjectType;
   operator: string;
   name?: string;
+  query?: {
+    [key: string]: any;
+  };
+  type?: string; // 当operator为sql的时候会需要type
 }
 
 export declare type PredItemType =
@@ -40,10 +44,9 @@ export const isSimpleQuery = (logicform: LogicformType) => {
   }
 
   if (logicform.preds) {
-    for (const predItem of logicform.preds) {
-      if (typeof predItem !== 'string') {
-        return false;
-      }
+    const stringedPred = JSON.stringify(logicform.preds);
+    if (stringedPred.indexOf('"operator":') > 0) {
+      return false;
     }
   }
 
@@ -288,6 +291,12 @@ export const drilldownLogicform = (
   groupbyItem: any,
   downHierarchy?: string
 ) => {
+  const debug = false;
+  if (debug) {
+    console.log('input logicform');
+    console.log(JSON.stringify(logicform));
+  }
+
   if (!logicform.groupby) return null; //必须有groupby才能下钻
   const newLF: LogicformType = JSON.parse(JSON.stringify(logicform));
   normaliseGroupby(newLF);
@@ -345,6 +354,11 @@ export const drilldownLogicform = (
         ],
       };
       newLF.groupby[0].level = hierarchy[thisLevelIndex + drilldownLevel].name;
+
+      if (debug) {
+        console.log('output logicform');
+        console.log(JSON.stringify(newLF));
+      }
       return newLF;
     }
   } else {
@@ -381,6 +395,10 @@ export const drilldownLogicform = (
         newLF.sort = newSort;
       }
 
+      if (debug) {
+        console.log('output logicform');
+        console.log(JSON.stringify(newLF));
+      }
       return newLF;
     }
   }
