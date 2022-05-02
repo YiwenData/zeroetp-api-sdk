@@ -118,28 +118,34 @@ export const getHierarchyCodeLength = (schema: SchemaType, level: string) => {
 export function getDrillDownProp(schema: SchemaType) {
   if (!schema) return []; // 如果没有schema，代表logicform result报错了
   const propNames: string[] = [];
-  schema.properties.forEach((property) => {
+
+  // 一个递归函数
+  const addToArrayWithProperty = (property: PropertyType, prefix?: string) => {
+    const pushToPropNames = (propertyName: string, prefix?: string) => {
+      propNames.push(prefix ? `${prefix}_${propertyName}` : propertyName);
+    };
+    if (property.isArray) return; // array因为如果做分组的话，其中的一些统计值都会重复计算，所以默认不做drilldown了
+
     if (property.is_categorical) {
-      propNames.push(property.name);
+      pushToPropNames(property.name, prefix);
     } else if (property.type === 'object' && property.schema) {
-      propNames.push(property.name);
+      if (property.schema.hierarchy) {
+        property.schema.hierarchy.forEach((h: any) => {
+          pushToPropNames(`${property.name}(${h.name})`, prefix);
+        });
+      } else {
+        pushToPropNames(property.name, prefix);
+      }
 
       // 这里要获取其他schema的属性！
       property.schema.properties.forEach((refProperty: PropertyType) => {
-        if (refProperty.is_categorical) {
-          propNames.push(`${property.name}_${refProperty.name}`);
-        }
-        if (refProperty.type === 'object') {
-          if (refProperty.schema && refProperty.schema.hierarchy) {
-            refProperty.schema.hierarchy.forEach((h: any) => {
-              propNames.push(`${property.name}_${refProperty.name}(${h.name})`);
-            });
-          } else {
-            propNames.push(`${property.name}_${refProperty.name}`);
-          }
-        }
+        addToArrayWithProperty(refProperty, property.name);
       });
     }
+  };
+
+  schema.properties.forEach((property) => {
+    addToArrayWithProperty(property);
   });
   return propNames;
 }

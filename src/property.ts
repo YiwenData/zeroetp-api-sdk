@@ -27,6 +27,7 @@ export interface PropertyType {
   is_categorical?: boolean;
   is_speedish?: boolean;
   is_fake?: boolean;
+  use_minus_on_mom?: boolean; // 在计算同环比的时候，是用除法还是减法。默认的话，绝对值类型的用除法，百分比类型的用减法，is_speedish的也用除法
   ref?: string;
   ref_prop?: string;
   unit?: string;

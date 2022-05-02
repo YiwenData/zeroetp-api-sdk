@@ -9,6 +9,7 @@ export interface PredItemObjectType {
     [key: string]: any;
   };
   type?: string; // 当operator为sql的时候会需要type
+  schema?: string; // 跨schema的logicform表达的时候，需要指定该参数
 }
 
 export declare type PredItemType =
@@ -44,7 +45,17 @@ export const isSimpleQuery = (logicform: LogicformType) => {
   }
 
   if (logicform.preds) {
-    const stringedPred = JSON.stringify(logicform.preds);
+    const stringedPred = JSON.stringify(
+      logicform.preds.filter((p) => {
+        if (Array.isArray(p)) {
+          return p[0].name !== '_id';
+        } else if (typeof p === 'object') {
+          return p.name !== '_id';
+        } else {
+          return p !== '_id';
+        }
+      })
+    );
     if (stringedPred.indexOf('"operator":') > 0) {
       return false;
     }
