@@ -5,7 +5,7 @@ export * from './schema';
 import request from './request';
 import { LogicformType } from './logicform';
 import { SchemaType } from './schema';
-import { PropertyType } from './property';
+import { PropertyType, RepresentationType } from './property';
 import type { RequestOptionsInit } from 'umi-request';
 export interface SigninAPIResultType {
   token: string;
@@ -27,18 +27,13 @@ export interface LogicformAPIResultType {
   logicform?: LogicformType; // normalized logicform
   columnProperties: PropertyType[];
   functionInfo?: any;
-  returnType?:
-    | 'value'
-    | 'table'
-    | 'entity'
-    | 'entity-pred'
-    | 'entity-list'
-    | 'charts';
-  representationType?: string;
+  returnType?: RepresentationType; // 20220502之后会和下面合并
+  representationType?: RepresentationType; // 20220502之后会和下面合并
 }
 
 export interface AskAPIResultType {
-  logicform: LogicformType;
+  logicforms?: LogicformType[];
+  logicform?: LogicformType;
   schema: SchemaType;
   answer?: LogicformAPIResultType;
   error?: string;
