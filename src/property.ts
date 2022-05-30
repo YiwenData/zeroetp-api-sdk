@@ -23,7 +23,8 @@ export interface PropertyType {
     | 'object'
     | 'geo'
     | 'nested'
-    | 'mixed';
+    | 'mixed'
+    | 'report';
   granularity?:
     | 'second'
     | 'minute'

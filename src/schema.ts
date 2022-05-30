@@ -22,6 +22,16 @@ export interface SchemaType {
     name: string;
     pred?: any;
   }; // 用于Alisa，默认的问答pred。有两个作用，一个是sort有_slot的时候，作为默认的pred。第二个是一旦设置了这个，那么在node为非is_schema的时候，把simpleQuery转化成pred计算;
+  modality?: {
+    detail?: {
+      type: 'card' | 'url';
+      config?: any;
+    };
+    list?: {
+      type: 'table';
+      config?: any;
+    };
+  }; // 决定在前端展示的模态
 }
 
 export function getIDProperty(schema: SchemaType) {
