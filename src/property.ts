@@ -37,7 +37,7 @@ export interface PropertyType {
   is_supplementary?: boolean; // 这个字段是不是内部帮助字段。内部帮助字段不会被学习，不会显示在ui上
   is_name?: boolean;
   is_categorical?: boolean;
-  is_speedish?: boolean;
+  is_additive?: boolean;
   is_fake?: boolean;
   use_minus_on_mom?: boolean; // 在计算同环比的时候，是用除法还是减法。默认的话，绝对值类型的用除法，百分比类型的用减法，is_speedish的也用除法
   ref?: string;
