@@ -1,12 +1,13 @@
 {
   "name": "zeroetp-api-sdk",
-  "version": "1.1.67",
+  "version": "1.1.73",
   "description": "亿问API SDK",
   "main": "lib/index.js",
   "module": "lib/index.esm.js",
   "repository": "https://github.com/YiwenData/zeroetp-api-sdk",
   "scripts": {
     "test": "npm run build;node test/util.js | tap-spec",
+    "testOne": "npm run build;node test/drilldown.js | tap-spec",
     "prebuild": "rm -rf lib",
     "prepublishOnly": "npm run build",
     "build": "rollup -c"

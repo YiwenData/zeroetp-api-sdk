@@ -3,7 +3,7 @@ import { SchemaType, findPropByName, getNameProperty } from './schema';
 
 export interface PredItemObjectType {
   pred?: string | PredItemObjectType;
-  operator: string;
+  operator?: string;
   name?: string;
   query?: {
     [key: string]: any;
@@ -12,10 +12,7 @@ export interface PredItemObjectType {
   schema?: string; // 跨schema的logicform表达的时候，需要指定该参数
 }
 
-export declare type PredItemType =
-  | string
-  | PredItemObjectType
-  | PredItemObjectType[];
+export declare type PredItemType = string | PredItemObjectType;
 export interface LogicformType {
   schema?: string;
   schemaName?: string;
@@ -36,6 +33,29 @@ export interface LogicformType {
   expands?: string[]; // 对若干个子字段进行entity的展开。
   close_default_query?: boolean; // 是否不用default_query
   children?: LogicformType[];
+  _role?: string;
+  entity_id?: string;
+}
+
+export interface NormedGroupbyItemType {
+  _id: string;
+  level?: string;
+  name?: string;
+}
+
+export interface NormedLogicformType {
+  schema?: string;
+  schemaName?: string;
+  query?: any;
+  total?: number;
+  sort?: object;
+  limit?: number;
+  skip?: number;
+  preds?: PredItemObjectType[];
+  groupby?: NormedGroupbyItemType[];
+  having?: any;
+  entity_id?: string;
+  close_default_query?: boolean; // 是否不用default_query
   _role?: string;
 }
 
@@ -302,12 +322,6 @@ export const drilldownLogicform = (
   groupbyItem: any,
   downHierarchy?: string
 ) => {
-  const debug = false;
-  if (debug) {
-    console.log('input logicform');
-    console.log(JSON.stringify(logicform));
-  }
-
   if (!logicform.groupby) return null; //必须有groupby才能下钻
   const newLF: LogicformType = JSON.parse(JSON.stringify(logicform));
   normaliseGroupby(newLF);
@@ -329,6 +343,27 @@ export const drilldownLogicform = (
     );
     return null;
   }
+
+  // 如果groupby的key改了，检查一下sort
+  const updateSort = (newLF: LogicformType) => {
+    if (newLF.sort) {
+      const newSort: any = {};
+
+      for (const [k, v] of Object.entries(newLF.sort)) {
+        if (k === groupbyProp.name) {
+          newSort[
+            typeof newLF.groupby[0] === 'string'
+              ? newLF.groupby[0]
+              : newLF.groupby[0]._id
+          ] = v;
+        } else {
+          newSort[k] = v;
+        }
+      }
+
+      newLF.sort = newSort;
+    }
+  };
 
   if (newLF.groupby[0].level) {
     const hierarchy: any[] = groupbyProp.schema.hierarchy;
@@ -366,52 +401,36 @@ export const drilldownLogicform = (
       };
       newLF.groupby[0].level = hierarchy[thisLevelIndex + drilldownLevel].name;
 
-      if (debug) {
-        console.log('output logicform');
-        console.log(JSON.stringify(newLF));
-      }
       return newLF;
     }
-  } else {
-    if (downHierarchy || groupbyProp.hierarchy?.down) {
-      const nextLevel = downHierarchy || groupbyProp.hierarchy?.down;
-      newLF.query = {
-        ...newLF.query,
-      };
-      newLF.query[newLF.groupby[0]._id] = groupbyItem._id;
-      const groupbyChain = newLF.groupby[0]._id.split('_');
-      groupbyChain.pop();
-      if (nextLevel === '_id') {
-        newLF.groupby[0] = groupbyChain[0];
-      } else {
-        newLF.groupby[0] = [...groupbyChain, nextLevel].join('_');
-      }
-
-      // 在这里change一下sort
-      if (newLF.sort) {
-        const newSort: any = {};
-
-        for (const [k, v] of Object.entries(newLF.sort)) {
-          if (k === groupbyProp.name) {
-            newSort[
-              typeof newLF.groupby[0] === 'string'
-                ? newLF.groupby[0]
-                : newLF.groupby[0]._id
-            ] = v;
-          } else {
-            newSort[k] = v;
-          }
-        }
-
-        newLF.sort = newSort;
-      }
-
-      if (debug) {
-        console.log('output logicform');
-        console.log(JSON.stringify(newLF));
-      }
-      return newLF;
+  } else if (downHierarchy || groupbyProp.hierarchy?.down) {
+    const nextLevel = downHierarchy || groupbyProp.hierarchy?.down;
+    newLF.query = {
+      ...newLF.query,
+    };
+    newLF.query[newLF.groupby[0]._id] = groupbyItem._id;
+    const groupbyChain = newLF.groupby[0]._id.split('_');
+    groupbyChain.pop();
+    if (nextLevel === '_id') {
+      newLF.groupby[0] = groupbyChain[0];
+    } else {
+      newLF.groupby[0] = [...groupbyChain, nextLevel].join('_');
     }
+
+    updateSort(newLF);
+    return newLF;
+  } else if (newLF.groupby[0]._id.indexOf('_') > 0) {
+    // 列入groupby ： 产品_品牌_公司
+    newLF.query = {
+      ...newLF.query,
+    };
+    newLF.query[newLF.groupby[0]._id] = groupbyItem._id;
+    newLF.groupby[0]._id = newLF.groupby[0]._id
+      .split('_')
+      .slice(0, -1)
+      .join('_');
+    updateSort(newLF);
+    return newLF;
   }
 
   return null;
