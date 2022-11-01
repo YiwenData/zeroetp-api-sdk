@@ -64,6 +64,10 @@ export const isSimpleQuery = (logicform: LogicformType) => {
     return false;
   }
 
+  if ('entity_id' in logicform) {
+    return false;
+  }
+
   if (logicform.preds) {
     const stringedPred = JSON.stringify(
       logicform.preds.filter((p) => {
