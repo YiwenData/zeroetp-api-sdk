@@ -13,10 +13,9 @@ export interface SchemaType {
   description?: string;
   properties: PropertyType[]; // 不能在修改schema的时候修改。用另外的接口。
   editable?: boolean; // 前端是否能修改数据
-  show_id?: boolean; // 前端是否展示_id列
   hierarchy?: HierarchyItemType[];
   use_db_date_as_mtd?: boolean; // 是不是要用数据库里面存在的数据的最后一天作为mtd，qtd，ytd的today的时间
-  use_view?: boolean; // 一个优化选项，要不要用live view来替代view function
+  versioned?: boolean; // 是不是版控模型
   main_pred?: {
     operator: string;
     name: string;

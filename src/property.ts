@@ -74,7 +74,7 @@ export interface PropertyType {
     presentation?: RepresentationType;
     delimiter?: boolean;
   };
-  properties?: PropertyType[]; // 子Property
+  versioned?: boolean; // 是不是版控模型
   // 一个帮助的字段，不太确定是不是放这里比较好。目前的用途是告诉前端怎么去做下钻。
   hierarchy?: {
     up?: string;
