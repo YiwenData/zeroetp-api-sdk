@@ -1,6 +1,6 @@
 {
   "name": "zeroetp-api-sdk",
-  "version": "1.1.76",
+  "version": "1.1.79",
   "description": "亿问API SDK",
   "main": "lib/index.js",
   "module": "lib/index.esm.js",
@@ -20,11 +20,12 @@
     "package.json",
     "README.md"
   ],
+  "type": "module",
   "devDependencies": {
     "jsdom": "^16.6.0",
     "jsdom-global": "^3.0.2",
-    "rollup": "^2.48.0",
-    "rollup-plugin-typescript2": "^0.30.0",
+    "rollup": "^3.7.0",
+    "rollup-plugin-typescript2": "^0.34.1",
     "tap-spec": "^5.0.0",
     "tape": "^5.2.2",
     "typescript": "^4.2.4"

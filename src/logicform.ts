@@ -35,6 +35,7 @@ export interface LogicformType {
   children?: LogicformType[];
   _role?: string;
   entity_id?: string;
+  _unknown?: string[];
 }
 
 export interface NormedGroupbyItemType {
@@ -57,6 +58,7 @@ export interface NormedLogicformType {
   entity_id?: string;
   close_default_query?: boolean; // 是否不用default_query
   _role?: string;
+  _unknown?: string[];
 }
 
 export const isSimpleQuery = (logicform: LogicformType) => {
@@ -88,6 +90,14 @@ export const isSimpleQuery = (logicform: LogicformType) => {
   return true;
 };
 
+export const isEntity = (logicform: LogicformType) => {
+  if ('entity_id' in logicform) {
+    return true;
+  }
+
+  return false;
+};
+
 // getMinTimeGranularity用到了从小到大的逻辑，这个顺序不能改
 export const getSupportedTimeWindows = () => {
   return ['hour', 'day', 'week', 'month', 'quarter', 'year'];
@@ -113,9 +123,20 @@ export const getMinTimeGranularity = (dateValue: any) => {
   // 这里假设了tws从小到大排序
   const tws = getSupportedTimeWindows();
 
+  if (dateValue === 'YTD') {
+    return 'year';
+  }
+  if (dateValue === 'QTD') {
+    return 'quarter';
+  }
+  if (dateValue === 'MTD') {
+    return 'month';
+  }
+
   if (isRelativeDateForm(dateValue)) {
     for (const tw of tws) {
       if (tw in dateValue) return tw;
+      if (dateValue.$offset && tw in dateValue.$offset) return tw;
     }
   } else {
     for (const tw of tws.reverse()) {
