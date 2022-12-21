@@ -4,7 +4,8 @@ export type RepresentationType =
   | 'report'
   | 'table'
   | 'pie'
-  | 'bar'
+  | 'bar' // 横向的柱状图
+  | 'column' // 纵向的柱状图（一般意义上的bar，这里用的是ant chart的定义，很反直觉）
   | 'map'
   | 'line'
   | 'chart'; // 自定义的echart option;

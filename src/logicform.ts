@@ -98,6 +98,30 @@ export const isEntity = (logicform: LogicformType) => {
   return false;
 };
 
+export const isValue = (logicform: LogicformType) => {
+  if (logicform.groupby || isSimpleQuery(logicform) || isEntity(logicform)) {
+    return false;
+  }
+
+  return true;
+};
+
+export const isDistinct = (logicform: LogicformType) => {
+  if (logicform.groupby && !logicform.preds) {
+    return true;
+  }
+
+  return false;
+};
+
+export const isStats = (logicform: LogicformType) => {
+  if (logicform.groupby && logicform.preds) {
+    return true;
+  }
+
+  return false;
+};
+
 // getMinTimeGranularity用到了从小到大的逻辑，这个顺序不能改
 export const getSupportedTimeWindows = () => {
   return ['hour', 'day', 'week', 'month', 'quarter', 'year'];
