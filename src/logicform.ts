@@ -1,5 +1,5 @@
 import moment from 'moment';
-import { SchemaType, findPropByName, getNameProperty } from './schema';
+import { SchemaType, findPropByName, getIDProperty } from './schema';
 
 export interface PredItemObjectType {
   pred?: string | PredItemObjectType;
@@ -439,16 +439,18 @@ export const drilldownLogicform = (
         }
       }
 
-      const nameProp = getNameProperty(groupbyProp.schema);
+      const idProp = getIDProperty(groupbyProp.schema);
+      if (!idProp) return null;
+
+      const id = groupbyItem[newLF.groupby[0].name]._id;
+
       newLF.query[newLF.groupby[0]._id] = {
         schema: groupbyProp.schema._id,
-        operator: '$ent',
-        field: nameProp.name,
-        name: groupbyItem[`${newLF.groupby[0]._id}(${newLF.groupby[0].level})`][
-          nameProp.name
-        ],
+        query: { [idProp.name]: id },
+        entity_id: id,
       };
       newLF.groupby[0].level = hierarchy[thisLevelIndex + drilldownLevel].name;
+      delete newLF.groupby[0].name;
 
       return newLF;
     }
