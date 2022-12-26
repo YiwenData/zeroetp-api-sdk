@@ -3,7 +3,7 @@ export * from './property';
 export * from './schema';
 
 import request from './request';
-import { LogicformType } from './logicform';
+import { LogicformType, NormedLogicformType } from './logicform';
 import { SchemaType } from './schema';
 import { PropertyType, RepresentationType } from './property';
 import type { RequestOptionsInit } from 'umi-request';
@@ -24,7 +24,7 @@ export interface LogicformAPIResultType {
   result: any;
   total?: number;
   error?: any;
-  logicform?: LogicformType; // normalized logicform
+  logicform?: NormedLogicformType;
   columnProperties: PropertyType[];
   functionInfo?: any;
   returnType?: RepresentationType; // 20220502之后会和下面合并
