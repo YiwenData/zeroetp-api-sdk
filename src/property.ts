@@ -10,6 +10,7 @@ export type RepresentationType =
   | 'line'
   | 'chart'; // 自定义的echart option;
 export interface PropertyType {
+  _sid?: string; // 无业务无意义的一个id，方便property的增删改查
   _id?: string;
   name: string;
   syno?: string[];

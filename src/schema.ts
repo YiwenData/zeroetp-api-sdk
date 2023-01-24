@@ -13,6 +13,7 @@ export interface SchemaType {
   description?: string;
   properties: PropertyType[]; // 不能在修改schema的时候修改。用另外的接口。
   editable?: boolean; // 前端是否能修改数据
+  is_internal?: boolean,
   hierarchy?: HierarchyItemType[];
   use_db_date_as_mtd?: boolean; // 是不是要用数据库里面存在的数据的最后一天作为mtd，qtd，ytd的today的时间
   versioned?: boolean; // 是不是版控模型

@@ -34,6 +34,7 @@ export interface LogicformType {
   close_default_query?: boolean; // 是否不用default_query
   children?: LogicformType[];
   _role?: string;
+  _authQueryKeys?: string[];
   entity_id?: string;
   _unknown?: string[];
 }
@@ -57,6 +58,7 @@ export interface NormedLogicformType {
   having?: any;
   entity_id?: string;
   close_default_query?: boolean; // 是否不用default_query
+  _authQueryKeys?: string[];
   _role?: string;
   _unknown?: string[];
 }
