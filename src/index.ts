@@ -29,6 +29,7 @@ export interface LogicformAPIResultType {
   functionInfo?: any;
   returnType?: RepresentationType; // 20220502之后会和下面合并
   representationType?: RepresentationType; // 20220502之后会和下面合并
+  sqls?: string[];
 }
 
 export interface AskAPIResultType {

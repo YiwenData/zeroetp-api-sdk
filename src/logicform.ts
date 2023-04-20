@@ -465,9 +465,9 @@ export const drilldownLogicform = (
     const groupbyChain = newLF.groupby[0]._id.split('_');
     groupbyChain.pop();
     if (nextLevel === '_id') {
-      newLF.groupby[0] = groupbyChain[0];
+      newLF.groupby[0] = {_id: groupbyChain[0]};
     } else {
-      newLF.groupby[0] = [...groupbyChain, nextLevel].join('_');
+      newLF.groupby[0] = {_id: [...groupbyChain, nextLevel].join('_')};
     }
 
     updateSort(newLF);
