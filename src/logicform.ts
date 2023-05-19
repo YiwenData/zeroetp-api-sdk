@@ -482,6 +482,7 @@ export const drilldownLogicform = (
       .split('_')
       .slice(0, -1)
       .join('_');
+    newLF.groupby[0].name = newLF.groupby[0]._id;
     updateSort(newLF);
     return newLF;
   }
