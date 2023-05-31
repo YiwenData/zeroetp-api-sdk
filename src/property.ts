@@ -8,6 +8,7 @@ export type RepresentationType =
   | 'column' // 纵向的柱状图（一般意义上的bar，这里用的是ant chart的定义，很反直觉）
   | 'map'
   | 'line'
+  | 'scatter'
   | 'chart'; // 自定义的echart option;
 export interface PropertyType {
   _sid?: string; // 无业务无意义的一个id，方便property的增删改查

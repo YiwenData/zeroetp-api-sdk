@@ -465,7 +465,7 @@ export const drilldownLogicform = (
     const groupbyChain = newLF.groupby[0]._id.split('_');
     groupbyChain.pop();
     if (nextLevel === '_id') {
-      newLF.groupby[0] = {_id: groupbyChain[0]};
+      newLF.groupby[0] = {_id: groupbyChain.join('_')};
     } else {
       newLF.groupby[0] = {_id: [...groupbyChain, nextLevel].join('_')};
     }
