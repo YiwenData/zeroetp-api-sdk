@@ -37,6 +37,7 @@ export interface LogicformType {
   _authQueryKeys?: string[];
   entity_id?: string;
   _unknown?: string[];
+  _noRelationGroupby?: any[];
 }
 
 export interface NormedGroupbyItemType {
@@ -61,6 +62,7 @@ export interface NormedLogicformType {
   _authQueryKeys?: string[];
   _role?: string;
   _unknown?: string[];
+  _noRelationGroupby?: NormedGroupbyItemType[];
 }
 
 export const isSimpleQuery = (logicform: LogicformType) => {
@@ -175,9 +177,9 @@ export const getMinTimeGranularity = (dateValue: any) => {
       if (
         start.format(twFormatString) === end.format(twFormatString) &&
         start.format('YYYYMMDDHHmmss') ===
-          moment(start).startOf(twNormed).format('YYYYMMDDHHmmss') &&
+        moment(start).startOf(twNormed).format('YYYYMMDDHHmmss') &&
         end.format('YYYYMMDDHHmmss') ===
-          moment(end).endOf(twNormed).format('YYYYMMDDHHmmss')
+        moment(end).endOf(twNormed).format('YYYYMMDDHHmmss')
       ) {
         return tw;
       }
@@ -465,9 +467,9 @@ export const drilldownLogicform = (
     const groupbyChain = newLF.groupby[0]._id.split('_');
     groupbyChain.pop();
     if (nextLevel === '_id') {
-      newLF.groupby[0] = {_id: groupbyChain.join('_')};
+      newLF.groupby[0] = { _id: groupbyChain.join('_') };
     } else {
-      newLF.groupby[0] = {_id: [...groupbyChain, nextLevel].join('_')};
+      newLF.groupby[0] = { _id: [...groupbyChain, nextLevel].join('_') };
     }
 
     updateSort(newLF);
