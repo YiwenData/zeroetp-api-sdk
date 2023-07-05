@@ -1,5 +1,6 @@
 import moment from 'moment';
 import { SchemaType, findPropByName, getIDProperty } from './schema';
+import { RepresentationType } from './property';
 
 export interface PredItemObjectType {
   pred?: string | PredItemObjectType;
@@ -38,7 +39,7 @@ export interface LogicformType {
   entity_id?: string;
   _unknown?: string[];
   _noRelationGroupby?: any[];
-  representaion?: string;
+  representation?: RepresentationType;
 }
 
 export interface NormedGroupbyItemType {
@@ -64,7 +65,7 @@ export interface NormedLogicformType {
   _role?: string;
   _unknown?: string[];
   _noRelationGroupby?: NormedGroupbyItemType[];
-  representaion?: string;
+  representation?: RepresentationType;
 }
 
 export const isSimpleQuery = (logicform: LogicformType) => {
