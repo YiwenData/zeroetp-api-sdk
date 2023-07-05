@@ -38,6 +38,7 @@ export interface LogicformType {
   entity_id?: string;
   _unknown?: string[];
   _noRelationGroupby?: any[];
+  representaion?: string;
 }
 
 export interface NormedGroupbyItemType {
@@ -63,6 +64,7 @@ export interface NormedLogicformType {
   _role?: string;
   _unknown?: string[];
   _noRelationGroupby?: NormedGroupbyItemType[];
+  representaion?: string;
 }
 
 export const isSimpleQuery = (logicform: LogicformType) => {
