@@ -21,6 +21,7 @@ export interface LogicformType {
   total?: number;
   sort?: object;
   limit?: number;
+  limitBy?: number;
   skip?: number;
   preds?: PredItemType[];
   field?: string;
@@ -55,6 +56,7 @@ export interface NormedLogicformType {
   total?: number;
   sort?: object;
   limit?: number;
+  limitBy?: number;
   skip?: number;
   preds?: PredItemObjectType[];
   groupby?: NormedGroupbyItemType[];
