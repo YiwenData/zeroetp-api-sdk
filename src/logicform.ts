@@ -182,9 +182,9 @@ export const getMinTimeGranularity = (dateValue: any) => {
       if (
         start.format(twFormatString) === end.format(twFormatString) &&
         start.format('YYYYMMDDHHmmss') ===
-        moment(start).startOf(twNormed).format('YYYYMMDDHHmmss') &&
+          moment(start).startOf(twNormed).format('YYYYMMDDHHmmss') &&
         end.format('YYYYMMDDHHmmss') ===
-        moment(end).endOf(twNormed).format('YYYYMMDDHHmmss')
+          moment(end).endOf(twNormed).format('YYYYMMDDHHmmss')
       ) {
         return tw;
       }
@@ -424,44 +424,65 @@ export const drilldownLogicform = (
   };
 
   if (newLF.groupby[0].level) {
-    const hierarchy: any[] = groupbyProp.schema.hierarchy;
+    if (groupbyProp.schema?.hierarchy) {
+      const hierarchy: any[] = groupbyProp.schema.hierarchy;
 
-    const thisLevelIndex = hierarchy.findIndex(
-      (h) => h.name === newLF.groupby[0].level
-    );
-    if (thisLevelIndex < hierarchy.length - 1) {
-      let drilldownLevel = 1;
-      let groupbyItemID = groupbyItem._id;
+      const thisLevelIndex = hierarchy.findIndex(
+        (h) => h.name === newLF.groupby[0].level
+      );
+      if (thisLevelIndex < hierarchy.length - 1) {
+        let drilldownLevel = 1;
+        let groupbyItemID = groupbyItem._id;
 
-      // 特殊逻辑，对于geo来说，直辖市直接下钻2级(重庆市除外，重庆市就算是直辖市，也有两个子分区)
-      if (groupbyProp.schema._id === 'geo') {
-        if (newLF.groupby[0].level === '省市') {
-          if (
-            groupbyItemID.endsWith('31') ||
-            groupbyItemID.endsWith('11') ||
-            groupbyItemID.endsWith('12')
-          ) {
-            // 4个直辖市判断
-            drilldownLevel = 2;
-            groupbyItemID += '01';
+        // 特殊逻辑，对于geo来说，直辖市直接下钻2级(重庆市除外，重庆市就算是直辖市，也有两个子分区)
+        if (groupbyProp.schema._id === 'geo') {
+          if (newLF.groupby[0].level === '省市') {
+            if (
+              groupbyItemID.endsWith('31') ||
+              groupbyItemID.endsWith('11') ||
+              groupbyItemID.endsWith('12')
+            ) {
+              // 4个直辖市判断
+              drilldownLevel = 2;
+              groupbyItemID += '01';
+            }
           }
         }
+
+        const idProp = getIDProperty(groupbyProp.schema);
+        if (!idProp) return null;
+
+        const id = groupbyItem[newLF.groupby[0].name]._id;
+
+        newLF.query[newLF.groupby[0]._id] = {
+          schema: groupbyProp.schema._id,
+          query: { [idProp.name]: id },
+          entity_id: id,
+        };
+        newLF.groupby[0].level =
+          hierarchy[thisLevelIndex + drilldownLevel].name;
+        delete newLF.groupby[0].name;
+
+        return newLF;
+      }
+    } else if (groupbyProp.primal_type === 'date') {
+      if (
+        newLF.groupby[0].level === 'year' ||
+        newLF.groupby[0].level === 'quarter'
+      ) {
+        newLF.groupby[0].level = 'month';
+        delete newLF.groupby[0].name;
+        return newLF;
       }
 
-      const idProp = getIDProperty(groupbyProp.schema);
-      if (!idProp) return null;
-
-      const id = groupbyItem[newLF.groupby[0].name]._id;
-
-      newLF.query[newLF.groupby[0]._id] = {
-        schema: groupbyProp.schema._id,
-        query: { [idProp.name]: id },
-        entity_id: id,
-      };
-      newLF.groupby[0].level = hierarchy[thisLevelIndex + drilldownLevel].name;
-      delete newLF.groupby[0].name;
-
-      return newLF;
+      if (
+        newLF.groupby[0].level === 'month' ||
+        newLF.groupby[0].level === 'week'
+      ) {
+        newLF.groupby[0].level = 'day';
+        delete newLF.groupby[0].name;
+        return newLF;
+      }
     }
   } else if (downHierarchy || groupbyProp.hierarchy?.down) {
     const nextLevel = downHierarchy || groupbyProp.hierarchy?.down;
