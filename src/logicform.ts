@@ -466,21 +466,50 @@ export const drilldownLogicform = (
         return newLF;
       }
     } else if (groupbyProp.primal_type === 'date') {
-      if (
-        newLF.groupby[0].level === 'year' ||
-        newLF.groupby[0].level === 'quarter'
-      ) {
-        newLF.groupby[0].level = 'month';
-        delete newLF.groupby[0].name;
-        return newLF;
+      const level = newLF.groupby[0].level;
+      let newLevel: string | undefined = undefined;
+      if (level === 'year' || level === 'quarter') {
+        newLevel = 'month';
       }
 
-      if (
-        newLF.groupby[0].level === 'month' ||
-        newLF.groupby[0].level === 'week'
-      ) {
-        newLF.groupby[0].level = 'day';
+      if (level === 'month' || level === 'week') {
+        newLevel = 'day';
+      }
+
+      if (newLevel) {
+        // query
+        const oldQueryKey = `${groupbyProp.name}(${level})`;
+        const newQueryKey = `${groupbyProp.name}(${newLevel})`;
+
+        if (!newLF.query) newLF.query = {};
+        if (!newLF.query[groupbyProp.name]) newLF.query[groupbyProp.name] = {};
+
+        // 根据之前的level来决定怎么处置这个值：
+        const value = groupbyItem[oldQueryKey];
+        if (level === 'year') {
+          newLF.query[groupbyProp.name][level] = parseInt(value);
+        } else if (level === 'quarter') {
+          const vs = value.split('-').map((i: string) => parseInt(i));
+          newLF.query[groupbyProp.name].year = vs[0];
+          newLF.query[groupbyProp.name].quarter = vs[1];
+        } else if (level === 'month') {
+          const vs = value.split('-').map((i: string) => parseInt(i));
+          newLF.query[groupbyProp.name].year = vs[0];
+          newLF.query[groupbyProp.name].month = vs[1];
+        } else if (level === 'week') {
+          const vs = value.split('-').map((i: string) => parseInt(i));
+          newLF.query[groupbyProp.name].year = vs[0];
+          newLF.query[groupbyProp.name].week = vs[1];
+        }
+
+        if (newLF.sort && (newLF.sort as any)[oldQueryKey]) {
+          (newLF.sort as any)[newQueryKey] = (newLF.sort as any)[oldQueryKey];
+          delete (newLF.sort as any)[oldQueryKey];
+        }
+
+        newLF.groupby[0].level = newLevel;
         delete newLF.groupby[0].name;
+
         return newLF;
       }
     }
