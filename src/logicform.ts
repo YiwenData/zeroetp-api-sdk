@@ -385,6 +385,11 @@ export const drilldownLogicform = (
   normaliseGroupby(newLF);
   if (!newLF.query) newLF.query = {};
 
+  // 下钻不会把limit,having,skip带过去
+  delete newLF.skip;
+  delete newLF.limit;
+  delete newLF.having;
+
   // 一般来说，__开头的，是前端自己添加的一些辅助行。例如汇总行之类的。
   if (
     (typeof groupbyItem === 'string' && groupbyItem.startsWith('__')) ||
@@ -513,7 +518,9 @@ export const drilldownLogicform = (
         return newLF;
       }
     }
-  } else if (downHierarchy || groupbyProp.hierarchy?.down) {
+  }
+
+  if (downHierarchy || groupbyProp.hierarchy?.down) {
     const nextLevel = downHierarchy || groupbyProp.hierarchy?.down;
     newLF.query = {
       ...newLF.query,
@@ -540,6 +547,7 @@ export const drilldownLogicform = (
       .slice(0, -1)
       .join('_');
     newLF.groupby[0].name = newLF.groupby[0]._id;
+    delete newLF.groupby[0].level;
     updateSort(newLF);
     return newLF;
   }

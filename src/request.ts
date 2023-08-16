@@ -4,6 +4,12 @@
  */
 import { extend, RequestOptionsInit } from 'umi-request';
 
+declare global {
+  interface Window {
+    publicPath: string;
+  }
+}
+
 const codeMessage: { [key: number]: string } = {
   200: '服务器成功返回请求的数据。',
   201: '新建或修改数据成功。',
@@ -22,14 +28,6 @@ const codeMessage: { [key: number]: string } = {
   504: '网关超时。',
 };
 
-/**
- * 配置request请求时的默认参数
- */
-const requestExtend = extend({
-  // errorHandler, // 默认错误处理
-  credentials: 'include', // CORS
-});
-
 const request = async <T = any>(url: string, options?: RequestOptionsInit) => {
   const newOptions: RequestOptionsInit = { ...options };
 
@@ -43,6 +41,20 @@ const request = async <T = any>(url: string, options?: RequestOptionsInit) => {
   }
 
   try {
+    /**
+     * 配置request请求时的默认参数
+     */
+    const extendDict: any = {
+      // errorHandler, // 默认错误处理
+      credentials: 'include', // CORS
+    };
+
+    if (window.publicPath && window.publicPath.length > 1) {
+      extendDict.prefix = window.publicPath.slice(0, -1); // 去掉最后的斜杠
+    }
+
+    const requestExtend = extend(extendDict);
+
     const response = await requestExtend<T>(url, newOptions);
     return response;
   } catch (error) {
