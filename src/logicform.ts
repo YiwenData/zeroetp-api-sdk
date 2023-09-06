@@ -39,6 +39,7 @@ export interface LogicformType {
   _authQueryKeys?: string[];
   entity_id?: string;
   _unknown?: string[];
+  _path?: any[];
   _noRelationGroupby?: any[];
   representation?: RepresentationType;
 }
@@ -67,6 +68,7 @@ export interface NormedLogicformType {
   _role?: string;
   _unknown?: string[];
   _noRelationGroupby?: NormedGroupbyItemType[];
+  _path?: any[];
   representation?: RepresentationType;
 }
 
