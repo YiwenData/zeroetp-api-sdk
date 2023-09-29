@@ -437,40 +437,48 @@ export const drilldownLogicform = (
       const thisLevelIndex = hierarchy.findIndex(
         (h) => h.name === newLF.groupby[0].level
       );
-      if (thisLevelIndex < hierarchy.length - 1) {
-        let drilldownLevel = 1;
-        let groupbyItemID = groupbyItem._id;
 
-        // 特殊逻辑，对于geo来说，直辖市直接下钻2级(重庆市除外，重庆市就算是直辖市，也有两个子分区)
-        if (groupbyProp.schema._id === 'geo') {
-          if (newLF.groupby[0].level === '省市') {
-            if (
-              groupbyItemID.endsWith('31') ||
-              groupbyItemID.endsWith('11') ||
-              groupbyItemID.endsWith('12')
-            ) {
-              // 4个直辖市判断
-              drilldownLevel = 2;
-              groupbyItemID += '01';
-            }
+      let drilldownLevel = 1;
+      let groupbyItemID = groupbyItem._id;
+
+      // 特殊逻辑，对于geo来说，直辖市直接下钻2级(重庆市除外，重庆市就算是直辖市，也有两个子分区)
+      if (groupbyProp.schema._id === 'geo') {
+        if (newLF.groupby[0].level === '省市') {
+          if (
+            groupbyItemID.endsWith('31') ||
+            groupbyItemID.endsWith('11') ||
+            groupbyItemID.endsWith('12')
+          ) {
+            // 4个直辖市判断
+            drilldownLevel = 2;
+            groupbyItemID += '01';
           }
         }
+      }
 
-        const idProp = getIDProperty(groupbyProp.schema);
-        if (!idProp) return null;
+      const idProp = getIDProperty(groupbyProp.schema);
+      if (!idProp) return null;
 
-        const id = groupbyItem[newLF.groupby[0].name]._id;
+      const id = groupbyItem[newLF.groupby[0].name]._id;
 
-        newLF.query[newLF.groupby[0]._id] = {
-          schema: groupbyProp.schema._id,
-          query: { [idProp.name]: id },
-          entity_id: id,
-        };
+      newLF.query[newLF.groupby[0]._id] = {
+        schema: groupbyProp.schema._id,
+        query: { [idProp.name]: id },
+        entity_id: id,
+      };
+
+      if (thisLevelIndex < hierarchy.length - 1) {
         newLF.groupby[0].level =
           hierarchy[thisLevelIndex + drilldownLevel].name;
         delete newLF.groupby[0].name;
 
         return newLF;
+      } else {
+        // 最低一层了，显示明细
+        return {
+          schema: newLF.schema,
+          query: newLF.query,
+        };
       }
     } else if (groupbyProp.primal_type === 'date') {
       const level = newLF.groupby[0].level;
@@ -483,31 +491,32 @@ export const drilldownLogicform = (
         newLevel = 'day';
       }
 
+      // query
+      const oldQueryKey = `${groupbyProp.name}(${level})`;
+
+      if (!newLF.query) newLF.query = {};
+      if (!newLF.query[groupbyProp.name]) newLF.query[groupbyProp.name] = {};
+
+      // 根据之前的level来决定怎么处置这个值：
+      const value = groupbyItem[oldQueryKey];
+      if (level === 'year') {
+        newLF.query[groupbyProp.name][level] = parseInt(value);
+      } else if (level === 'quarter') {
+        const vs = value.split('-').map((i: string) => parseInt(i));
+        newLF.query[groupbyProp.name].year = vs[0];
+        newLF.query[groupbyProp.name].quarter = vs[1];
+      } else if (level === 'month') {
+        const vs = value.split('-').map((i: string) => parseInt(i));
+        newLF.query[groupbyProp.name].year = vs[0];
+        newLF.query[groupbyProp.name].month = vs[1];
+      } else if (level === 'week') {
+        const vs = value.split('-').map((i: string) => parseInt(i));
+        newLF.query[groupbyProp.name].year = vs[0];
+        newLF.query[groupbyProp.name].week = vs[1];
+      }
+
       if (newLevel) {
-        // query
-        const oldQueryKey = `${groupbyProp.name}(${level})`;
         const newQueryKey = `${groupbyProp.name}(${newLevel})`;
-
-        if (!newLF.query) newLF.query = {};
-        if (!newLF.query[groupbyProp.name]) newLF.query[groupbyProp.name] = {};
-
-        // 根据之前的level来决定怎么处置这个值：
-        const value = groupbyItem[oldQueryKey];
-        if (level === 'year') {
-          newLF.query[groupbyProp.name][level] = parseInt(value);
-        } else if (level === 'quarter') {
-          const vs = value.split('-').map((i: string) => parseInt(i));
-          newLF.query[groupbyProp.name].year = vs[0];
-          newLF.query[groupbyProp.name].quarter = vs[1];
-        } else if (level === 'month') {
-          const vs = value.split('-').map((i: string) => parseInt(i));
-          newLF.query[groupbyProp.name].year = vs[0];
-          newLF.query[groupbyProp.name].month = vs[1];
-        } else if (level === 'week') {
-          const vs = value.split('-').map((i: string) => parseInt(i));
-          newLF.query[groupbyProp.name].year = vs[0];
-          newLF.query[groupbyProp.name].week = vs[1];
-        }
 
         if (newLF.sort && (newLF.sort as any)[oldQueryKey]) {
           (newLF.sort as any)[newQueryKey] = (newLF.sort as any)[oldQueryKey];
@@ -516,18 +525,25 @@ export const drilldownLogicform = (
 
         newLF.groupby[0].level = newLevel;
         delete newLF.groupby[0].name;
-
         return newLF;
+      } else {
+        // 不能往下了，显示明细
+        return {
+          schema: newLF.schema,
+          query: newLF.query,
+        };
       }
     }
   }
 
+  newLF.query = {
+    ...newLF.query,
+  };
+  newLF.query[newLF.groupby[0]._id] = groupbyItem._id;
+
   if (downHierarchy || groupbyProp.hierarchy?.down) {
     const nextLevel = downHierarchy || groupbyProp.hierarchy?.down;
-    newLF.query = {
-      ...newLF.query,
-    };
-    newLF.query[newLF.groupby[0]._id] = groupbyItem._id;
+
     const groupbyChain = newLF.groupby[0]._id.split('_');
     groupbyChain.pop();
     if (nextLevel === '_id') {
@@ -540,10 +556,6 @@ export const drilldownLogicform = (
     return newLF;
   } else if (newLF.groupby[0]._id.indexOf('_') > 0) {
     // 列入groupby ： 产品_品牌_公司
-    newLF.query = {
-      ...newLF.query,
-    };
-    newLF.query[newLF.groupby[0]._id] = groupbyItem._id;
     newLF.groupby[0]._id = newLF.groupby[0]._id
       .split('_')
       .slice(0, -1)
@@ -554,5 +566,9 @@ export const drilldownLogicform = (
     return newLF;
   }
 
-  return null;
+  // 不能往下了，显示明细
+  return {
+    query: newLF.query,
+    schema: newLF.schema,
+  };
 };
