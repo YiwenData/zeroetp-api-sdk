@@ -467,6 +467,35 @@ export const drilldownLogicform = (
         entity_id: id,
       };
 
+      // 因为设置了id，那么如果之前的logicform里面有展开了的chained query的，也要删除
+      const chain = newLF.groupby[0]._id.split('_');
+      if (chain.length > 1) {
+        let currentQuery = newLF.query;
+
+        for (let index = 0; index < chain.length; index++) {
+          const chainItem = chain[index];
+
+          if (index === chain.length - 1) {
+            delete currentQuery[chainItem];
+            break;
+          }
+
+          currentQuery = currentQuery[chainItem];
+          if (!currentQuery) break;
+
+          if (typeof currentQuery !== 'object') {
+            currentQuery = null;
+            break;
+          }
+          if (!currentQuery.schema) {
+            currentQuery = null;
+            break;
+          }
+
+          currentQuery = currentQuery.query || {};
+        }
+      }
+
       if (thisLevelIndex < hierarchy.length - 1) {
         newLF.groupby[0].level =
           hierarchy[thisLevelIndex + drilldownLevel].name;
