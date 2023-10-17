@@ -931,7 +931,7 @@ tape('drilldown by category', async (t) => {
     总销售量: 27011,
   };
 
-  const drilled = drilldownLogicform(logicform, schema, selectedItem);
+  let drilled = drilldownLogicform(logicform, schema, selectedItem);
   t.deepEqual(
     drilled,
     {
@@ -976,5 +976,92 @@ tape('drilldown by category', async (t) => {
       },
     },
     'drill down之后，要把冲突的query删掉'
+  );
+
+  // case2： 从地理位置应该下钻到店铺的
+  drilled = drilldownLogicform(
+    {
+      query: {
+        店铺: {
+          schema: 'store',
+          query: {
+            地理位置: {
+              schema: 'geo',
+              query: {
+                ID: '15676540',
+              },
+              entity_id: '15676540',
+            },
+          },
+        },
+      },
+      preds: [
+        {
+          pred: '销售量',
+          operator: '$sum',
+          name: '总销售量',
+        },
+      ],
+      schema: 'sales',
+      groupby: [
+        {
+          _id: '店铺_地理位置',
+          level: '区县',
+          name: '店铺_地理位置(区县)',
+        },
+      ],
+      sort: {
+        总销售量: -1,
+      },
+    },
+    schema,
+    {
+      _id: '1567654003',
+      '店铺_地理位置(区县)': {
+        _id: '1567654003',
+        ID: '1567654003',
+        名称: '奎屯市',
+        等级: null,
+        自治区: null,
+        parents: ['中国', '西北地区', '新疆维吾尔自治区', '伊犁哈萨克自治州'],
+      },
+      总销售量: 384,
+    }
+  );
+
+  t.deepEqual(
+    drilled,
+    {
+      query: {
+        店铺: {
+          schema: 'store',
+          query: {},
+        },
+        店铺_地理位置: {
+          schema: 'geo',
+          query: {
+            ID: '1567654003',
+          },
+          entity_id: '1567654003',
+        },
+      },
+      preds: [
+        {
+          pred: '销售量',
+          operator: '$sum',
+          name: '总销售量',
+        },
+      ],
+      schema: 'sales',
+      groupby: [
+        {
+          _id: '店铺',
+        },
+      ],
+      sort: {
+        总销售量: -1,
+      },
+    },
+    'geo + chained'
   );
 });

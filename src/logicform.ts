@@ -502,6 +502,13 @@ export const drilldownLogicform = (
         delete newLF.groupby[0].name;
 
         return newLF;
+      } else if (chain.length > 1) {
+        // 有chain的。上去一层
+        const newChain = [...chain];
+        newChain.pop();
+        const newGroupbyID = newChain.join('_');
+        newLF.groupby[0] = { _id: newGroupbyID };
+        return newLF;
       } else {
         // 最低一层了，显示明细
         return {
