@@ -1,6 +1,6 @@
 {
   "name": "zeroetp-api-sdk",
-  "version": "1.1.119",
+  "version": "1.1.120",
   "description": "亿问API SDK",
   "main": "lib/index.js",
   "module": "lib/index.esm.js",

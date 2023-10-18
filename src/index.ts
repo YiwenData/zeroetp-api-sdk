@@ -73,14 +73,14 @@ export async function execLogicform(logicform: LogicformType) {
 export async function ask(
   question: string,
   logicformOnly?: boolean,
-  preNode?: LogicformType
+  context?: LogicformType
 ) {
   return request<AskAPIResultType>(serverUrl('/ask'), {
     method: 'post',
     data: {
       ask: question,
       logicform_only: logicformOnly,
-      pre_node: preNode,
+      context,
     },
   });
 }
