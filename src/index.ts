@@ -24,6 +24,7 @@ export interface LogicformAPIResultType {
   result: any;
   total?: number;
   error?: any;
+  errorCode?: string;
   logicform?: NormedLogicformType;
   columnProperties: PropertyType[];
   functionInfo?: any;
@@ -38,6 +39,7 @@ export interface AskAPIResultType {
   schema: SchemaType;
   answer?: LogicformAPIResultType;
   error?: string;
+  errorCode?: string;
 }
 export interface SchemaAPIResultType {
   schema: SchemaType;
