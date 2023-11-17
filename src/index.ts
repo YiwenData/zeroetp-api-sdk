@@ -14,6 +14,7 @@ export interface SigninAPIResultType {
 
 export const config = {
   API_URL: '',
+  locale: null,
 };
 
 const serverUrl = (url: string) => `${config.API_URL}/api/v1${url}`;
@@ -66,9 +67,15 @@ export async function currentUser() {
 }
 
 export async function execLogicform(logicform: LogicformType) {
+  const params:any = {};
+  if (config.locale) {
+    params.locale = config.locale
+  }
+
   return request<LogicformAPIResultType>(serverUrl('/logicform'), {
     method: 'post',
     data: logicform,
+    params,
   });
 }
 
@@ -77,6 +84,11 @@ export async function ask(
   logicformOnly?: boolean,
   context?: LogicformType
 ) {
+  const params:any = {};
+  if (config.locale) {
+    params.locale = config.locale
+  }
+
   return request<AskAPIResultType>(serverUrl('/ask'), {
     method: 'post',
     data: {
@@ -84,13 +96,20 @@ export async function ask(
       logicform_only: logicformOnly,
       context,
     },
+    params,
   });
 }
 
 export async function voice(data: any) {
+  const params:any = {};
+  if (config.locale) {
+    params.locale = config.locale
+  }
+
   return request<any>(serverUrl('/nlq/voice'), {
     method: 'post',
     data,
+    params,
   });
 }
 

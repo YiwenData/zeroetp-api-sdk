@@ -7,6 +7,7 @@ require("jsdom-global")("", { url: "http://localhost:3052" });
 test("test request", async function (t) {
   try {
     APIService.config.API_URL = "http://localhost:3052";
+    APIService.config.locale = "zh-CN";
 
     await APIService.signin({
       username: "admin",
