@@ -16,7 +16,6 @@ export interface SchemaType {
   is_internal?: boolean;
   hierarchy?: HierarchyItemType[];
   use_db_date_as_mtd?: boolean; // 是不是要用数据库里面存在的数据的最后一天作为mtd，qtd，ytd的today的时间
-  versioned?: boolean; // 是不是版控模型
   main_pred?: {
     operator: string;
     name: string;
@@ -33,6 +32,7 @@ export interface SchemaType {
     };
   }; // 决定在前端展示的模态
   order?: number; // 决定在前端的排序
+  tag?: string[]; // 标签，和问答无关
 }
 
 export function getIDProperty(schema: SchemaType) {
