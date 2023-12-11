@@ -84,4 +84,7 @@ export interface PropertyType {
     down?: string;
   };
   can_drilldown?: boolean;  // 是不是支持下钻。包括页面下钻和自主分析。
+  analyzer?: { // 智能归因
+    customSummary?: string;  // 自定义总结框
+  }
 }
