@@ -33,6 +33,7 @@ export interface SchemaType {
   }; // 决定在前端展示的模态
   order?: number; // 决定在前端的排序
   tag?: string[]; // 标签，和问答无关
+  drilldown?: any[]; // 下钻白名单
 }
 
 export function getIDProperty(schema: SchemaType) {
