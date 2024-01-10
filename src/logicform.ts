@@ -11,6 +11,8 @@ export interface PredItemObjectType {
   };
   type?: string; // 当operator为sql的时候会需要type
   schema?: string; // 跨schema的logicform表达的时候，需要指定该参数
+  by?: string; // 一些参数
+  params?: any[]; // 一些参数
 }
 
 export declare type PredItemType = string | PredItemObjectType;
