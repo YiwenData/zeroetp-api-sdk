@@ -32,8 +32,8 @@ const request = async <T = any>(url: string, options?: RequestOptionsInit) => {
   const newOptions: RequestOptionsInit = { ...options };
 
   const token =
-    window.localStorage.getItem('token') ||
-    window.sessionStorage.getItem('token');
+    window.localStorage.getItem('chatbi-token') ||
+    window.sessionStorage.getItem('chatbi-token');
   if (token) {
     newOptions.headers = {
       Authorization: `Bearer ${token}`,

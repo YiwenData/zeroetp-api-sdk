@@ -56,7 +56,7 @@ export async function signin(params: any) {
   );
 
   if (response.token) {
-    window.localStorage.setItem('token', response.token);
+    window.localStorage.setItem('chatbi-token', response.token);
   }
 
   return response;
@@ -67,9 +67,9 @@ export async function currentUser() {
 }
 
 export async function execLogicform(logicform: LogicformType) {
-  const params:any = {};
+  const params: any = {};
   if (config.locale) {
-    params.locale = config.locale
+    params.locale = config.locale;
   }
 
   return request<LogicformAPIResultType>(serverUrl('/logicform'), {
@@ -84,9 +84,9 @@ export async function ask(
   logicformOnly?: boolean,
   context?: LogicformType
 ) {
-  const params:any = {};
+  const params: any = {};
   if (config.locale) {
-    params.locale = config.locale
+    params.locale = config.locale;
   }
 
   return request<AskAPIResultType>(serverUrl('/ask'), {
@@ -101,9 +101,9 @@ export async function ask(
 }
 
 export async function voice(data: any) {
-  const params:any = {};
+  const params: any = {};
   if (config.locale) {
-    params.locale = config.locale
+    params.locale = config.locale;
   }
 
   return request<any>(serverUrl('/nlq/voice'), {
