@@ -89,4 +89,5 @@ export interface PropertyType {
     customSummary?: string; // 自定义总结框
   };
   recommend_kpis?: any[];
+  components?: any[]; // 自定义指标中，
 }
