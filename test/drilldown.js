@@ -1064,4 +1064,233 @@ tape('drilldown by category', async (t) => {
     },
     'geo + chained'
   );
+
+  // 产品子品类分布， 下钻
+  drilled = drilldownLogicform(
+    {
+      "query": {},
+      "schema": "product",
+      "preds": [
+          {
+              "operator": "$count",
+              "name": "产品数量"
+          }
+      ],
+      "groupby": "子品类",
+      "schemaName": "产品"
+    },
+    {
+      "_id": "product",
+      "name": "产品",
+      "syno": [
+        "SKU",
+        "商品",
+        "product"
+      ],
+      "type": "entity",
+      "properties": [
+        {
+          "name": "名称",
+          "syno": [
+            "name"
+          ],
+          "type": "name",
+          "constraints": {
+            "required": true,
+            "enum": null
+          },
+          "_sid": "rWhm_XqrLlR-f1jkwOnzo",
+          "_id": "name",
+          "is_comparable": false,
+          "is_name": true,
+          "is_categorical": false,
+          "ui": {},
+          "auto_syno": true
+        },
+        {
+          "name": "编号",
+          "type": "ID",
+          "constraints": {
+            "unique": true,
+            "required": true,
+            "enum": null
+          },
+          "_sid": "ShLwI9lLbFLDZfk7uScZz",
+          "_id": "id",
+          "is_comparable": false,
+          "ui": {},
+          "is_name": true,
+          "is_categorical": false
+        },
+        {
+          "name": "品类",
+          "type": "category",
+          "syno": [
+            "category",
+            "类目"
+          ],
+          "constraints": {
+            "enum": [
+              "男装",
+              "女装",
+              "童装"
+            ]
+          },
+          "hierarchy": {
+            "down": "子品类"
+          },
+          "_sid": "Dx981X8tSFT92O8Vqdk95",
+          "_id": "category",
+          "is_comparable": false,
+          "is_categorical": true,
+          "is_name": false,
+          "ui": {}
+        },
+        {
+          "name": "子品类",
+          "type": "category",
+          "syno": [
+            "subcategory",
+            "子类目"
+          ],
+          "constraints": {
+            "enum": null
+          },
+          "hierarchy": {
+            "up": "品类",
+            "down": "_id"
+          },
+          "_sid": "PeX8EODCFE40gMwvBGBMR",
+          "_id": "subcategory",
+          "is_comparable": false,
+          "is_categorical": true,
+          "is_name": false,
+          "ui": {}
+        },
+        {
+          "name": "图片",
+          "type": "image",
+          "constraints": {
+            "enum": null
+          },
+          "_sid": "f2Q_ZFy12xejmkiUGdZEW",
+          "_id": "picture",
+          "is_comparable": false,
+          "ui": {},
+          "syno": [
+            "picture"
+          ]
+        },
+        {
+          "name": "价格",
+          "type": "currency",
+          "config": "CNY",
+          "syno": [
+            "price"
+          ],
+          "constraints": {
+            "enum": null
+          },
+          "_sid": "RHCSg6s2XZWOtCGIZX9BO",
+          "_id": "price",
+          "is_comparable": true,
+          "is_additive": true,
+          "ui": {},
+          "is_name": false
+        },
+        {
+          "name": "成本",
+          "type": "currency",
+          "config": "CNY",
+          "constraints": {
+            "enum": null
+          },
+          "_sid": "cPF8t3SSCvLDanP4DDSpw",
+          "_id": "cost",
+          "is_comparable": true,
+          "is_additive": true,
+          "ui": {},
+          "syno": [
+            "cost"
+          ],
+          "is_name": false
+        },
+        {
+          "name": "单件利润",
+          "type": "currency",
+          "udf": {
+            "function": "async (self) => self.价格 - self.成本",
+            "dependencies": [
+              "价格",
+              "成本"
+            ]
+          },
+          "constraints": {
+            "enum": null
+          },
+          "_sid": "ITJlXhj8OKBOjto9vc0lM",
+          "_id": "profit",
+          "is_comparable": true,
+          "is_additive": true,
+          "ui": {},
+          "is_name": false
+        },
+        {
+          "name": "子商品",
+          "isArray": true,
+          "type": "object",
+          "ref": "product",
+          "constraints": {
+            "enum": null
+          },
+          "_sid": "j_dqzTyyBDUrj1NC-nnRy",
+          "_id": "subproduct",
+          "is_comparable": false,
+          "ui": {},
+          "is_categorical": false,
+          "is_name": false
+        },
+        {
+          "name": "分类",
+          "type": "category",
+          "constraints": {
+            "enum": [
+              "单品",
+              "组合"
+            ]
+          },
+          "udf": {
+            "sql": "if(length(`subproduct`) <= 0, '单品', '组合')",
+            "dependencies": []
+          },
+          "_sid": "R6-ntAmbE3T95Jr4VUrYl",
+          "_id": "type",
+          "is_comparable": false,
+          "is_name": false,
+          "is_categorical": true,
+          "is_dynamic": true,
+          "ui": {},
+          "syno": [
+            "类型"
+          ]
+        },
+        {
+          "name": "链接",
+          "type": "url",
+          "constraints": {
+            "enum": null
+          },
+          "_sid": "tWyxQRuQ2NPAUd8LCK8kd",
+          "_id": "url",
+          "is_comparable": false,
+          "ui": {}
+        }
+      ],
+      "cache": {
+        "cron": "*/2 * * * *"
+      }
+    },
+    {_id: "羊绒衫", 子品类: "羊绒衫", 产品数量: 2},
+  );
+  t.deepEqual(drilled,    { query: { '子品类': '羊绒衫' }, schema: 'product' }, 'groupby to simple query');
 });

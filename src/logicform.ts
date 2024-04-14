@@ -394,6 +394,8 @@ export const drilldownLogicform = (
   delete newLF.limit;
   delete newLF.having;
 
+  // console.log('newLF', JSON.stringify(newLF));
+
   // 一般来说，__开头的，是前端自己添加的一些辅助行。例如汇总行之类的。
   if (
     (typeof groupbyItem === 'string' && groupbyItem.startsWith('__')) ||
@@ -588,6 +590,14 @@ export const drilldownLogicform = (
       newLF.groupby[0] = { _id: groupbyChain.join('_') };
     } else {
       newLF.groupby[0] = { _id: [...groupbyChain, nextLevel].join('_') };
+    }
+
+    // 其实是groupby _id，转变为simple query就好了
+    if (newLF.groupby[0]._id.length === 0) {
+      return {
+        query: newLF.query,
+        schema: newLF.schema,
+      };
     }
 
     updateSort(newLF);
