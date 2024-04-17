@@ -87,6 +87,7 @@ export interface PropertyType {
   analyzer?: {
     // 智能归因
     customSummary?: string; // 自定义总结框
+    drilldown?: any[]; // 下钻白名单
   };
   recommend_kpis?: any[];
   components?: any[]; // 自定义指标中，
