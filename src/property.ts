@@ -69,6 +69,7 @@ export interface PropertyType {
       role?: string; // 针对某一个角色做的展示
     }[];
     show_in_detail_only?: boolean;
+    hide?: boolean; // 是否要在所有界面隐藏
     ellipsis?: boolean;
     editable?: boolean;
     name?: boolean; // 是不是可以在UI上认为是name属性
