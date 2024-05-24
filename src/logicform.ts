@@ -311,12 +311,12 @@ export const getLogicformByTimeOffset = (
     return newLF;
   }
 
-  if (isRelativeDateForm(newLF.query[timeKey].$gte)) {
+  if (typeof newLF.query[timeKey] === 'object' && isRelativeDateForm(newLF.query[timeKey].$gte)) {
     newLF.query[timeKey].$gte = normaliseRelativeDateForm(
       newLF.query[timeKey].$gte
     ).$gte;
   }
-  if (isRelativeDateForm(newLF.query[timeKey].$lte)) {
+  if (typeof newLF.query[timeKey] === 'object' && isRelativeDateForm(newLF.query[timeKey].$lte)) {
     newLF.query[timeKey].$lte = normaliseRelativeDateForm(
       newLF.query[timeKey].$lte
     ).$lte;
@@ -325,6 +325,7 @@ export const getLogicformByTimeOffset = (
   // 如果时间范围和offset的时间范围不一致，那么不能做时间偏移
   const formatString = formatStringForTimeWindow(offsetLevel);
   if (
+    typeof newLF.query[timeKey] === 'object' && 
     moment(newLF.query[timeKey].$gte).format(formatString) !==
     moment(newLF.query[timeKey].$lte).format(formatString)
   ) {
@@ -332,15 +333,18 @@ export const getLogicformByTimeOffset = (
   }
 
   // 不是RelativeDateForm，麻烦点
-  for (const offsetKey of Object.keys(timeOffsetQuery[timeKey].$offset)) {
-    const offsetValue = timeOffsetQuery[timeKey].$offset[offsetKey];
-    newLF.query[timeKey].$gte = moment(newLF.query[timeKey].$gte)
-      .add(offsetValue, offsetKey)
-      .toDate();
-    newLF.query[timeKey].$lte = moment(newLF.query[timeKey].$lte)
-      .add(offsetValue, offsetKey)
-      .toDate();
+  if (typeof newLF.query[timeKey] === 'object') {
+    for (const offsetKey of Object.keys(timeOffsetQuery[timeKey].$offset)) {
+      const offsetValue = timeOffsetQuery[timeKey].$offset[offsetKey];
+      newLF.query[timeKey].$gte = moment(newLF.query[timeKey].$gte)
+        .add(offsetValue, offsetKey)
+        .toDate();
+      newLF.query[timeKey].$lte = moment(newLF.query[timeKey].$lte)
+        .add(offsetValue, offsetKey)
+        .toDate();
+    }
   }
+ 
   return newLF;
 };
 
