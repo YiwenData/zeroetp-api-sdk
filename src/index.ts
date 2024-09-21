@@ -22,7 +22,7 @@ const schemaID = (schema: SchemaType | string) =>
   typeof schema === 'string' ? schema : schema._id;
 export interface LogicformAPIResultType {
   schema: SchemaType;
-  schemas?: SchemaType[];
+  schemas?: Record<string, SchemaType>;
   result: any;
   total?: number;
   error?: any;
