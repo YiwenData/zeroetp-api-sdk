@@ -2,6 +2,9 @@ export * from './logicform';
 export * from './property';
 export * from './schema';
 
+declare module 'crypto-js'
+
+import CryptoJS from 'crypto-js';
 import request from './request';
 import { LogicformType, NormedLogicformType } from './logicform';
 import { SchemaType } from './schema';
@@ -185,7 +188,7 @@ export async function createSchema(schema: SchemaType) {
   return request<SchemaAPIResultType>(serverUrl(`/schemas`), {
     method: 'POST',
     data: {
-      encrypted: window.btoa(encodeURIComponent(JSON.stringify(schema)))
+      encrypted: CryptoJS.AES.encrypt(JSON.stringify(schema), 'theworld!!!!').toString()
     },
   });
 }
@@ -199,7 +202,7 @@ export async function updateSchema(schemaID: string, update: any) {
   return request<SchemaAPIResultType>(serverUrl(`/schemas/${schemaID}`), {
     method: 'PUT',
     data: {
-      encrypted: window.btoa(encodeURIComponent(JSON.stringify(update)))
+      encrypted: CryptoJS.AES.encrypt(JSON.stringify(update), 'theworld!!!!').toString()
     },
   });
 }
