@@ -185,7 +185,7 @@ export async function createSchema(schema: SchemaType) {
   return request<SchemaAPIResultType>(serverUrl(`/schemas`), {
     method: 'POST',
     data: {
-      encrypted: window.btoa(JSON.stringify(schema))
+      encrypted: window.btoa(encodeURIComponent(JSON.stringify(schema)))
     },
   });
 }
@@ -199,7 +199,7 @@ export async function updateSchema(schemaID: string, update: any) {
   return request<SchemaAPIResultType>(serverUrl(`/schemas/${schemaID}`), {
     method: 'PUT',
     data: {
-      encrypted: window.btoa(JSON.stringify(update))
+      encrypted: window.btoa(encodeURIComponent(JSON.stringify(update)))
     },
   });
 }
