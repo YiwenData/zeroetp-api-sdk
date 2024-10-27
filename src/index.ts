@@ -182,7 +182,7 @@ export async function getSchemas() {
 }
 
 export async function createSchema(schema: SchemaType) {
-  return request<SchemaAPIResultType>(serverUrl(`/schemas`), {
+  return request<SchemaAPIResultType>(serverUrl(`/schemas?encrypted=1`), {
     method: 'POST',
     data: schema,
   });
@@ -194,7 +194,7 @@ export async function getSchemaByID(schemaID: string) {
 
 // 除了property，_id，都能更新
 export async function updateSchema(schemaID: string, update: any) {
-  return request<SchemaAPIResultType>(serverUrl(`/schemas/${schemaID}`), {
+  return request<SchemaAPIResultType>(serverUrl(`/schemas/${schemaID}?encrypted=1`), {
     method: 'PUT',
     data: update,
   });
