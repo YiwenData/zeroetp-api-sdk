@@ -121,7 +121,7 @@ export async function createData(schema: SchemaType | string, data: any) {
   return request(serverUrl(`/data/${schemaID(schema)}`), {
     method: 'post',
     data: {
-      data,
+      encrypted: CryptoJS.AES.encrypt(JSON.stringify(data), 'theworld!!!!').toString()
     },
   });
 }
