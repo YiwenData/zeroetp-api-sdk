@@ -135,7 +135,9 @@ export async function updateDataByID(
     serverUrl(`/data/${schemaID(schema)}/${encodeURIComponent(dataID)}`),
     {
       method: 'put',
-      data: updateItem,
+      data: {
+        encrypted: CryptoJS.AES.encrypt(JSON.stringify(updateItem), 'theworld!!!!').toString()
+      },
     }
   );
 }
